@@ -4,7 +4,9 @@
     export let stateColor: string = "#ffffff";
 </script>
 
-<div style='--posX:{posX};--posY:{posY};--stateColor:{stateColor}'> </div>
+<!-- Peca -->
+<div style='--posX:{posX};--posY:{posY};--stateColor:{stateColor}'></div>
+<!-- ./Peca -->
 
 <style>
     div {

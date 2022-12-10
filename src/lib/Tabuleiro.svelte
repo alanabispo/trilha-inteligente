@@ -93,7 +93,9 @@
     }
 </script>
 
+<!-- Tabuleiro -->
 <div style="--lado:{ladoTabuleiro}px;">
+
     <!-- PecasTabuleiro -->
     {#each tabuleiro as linha}
         {#each linha as peca}
@@ -113,7 +115,9 @@
         <div class="conectores" style="--l:{con.l};--w:{con.w};--t:{con.t};--h:{con.h};--borda:{borda}px;"></div>
     {/each}
     <!-- ./Conectores -->
+
 </div>
+<!-- ./Tabuleiro -->
 
 <style>
     div {
