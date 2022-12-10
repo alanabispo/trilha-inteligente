@@ -1,29 +1,17 @@
 <script lang="ts">
-  import Tabuleiro from './lib/Tabuleiro.svelte';
+  import TabuleiroTrilha from './lib/Tabuleiro.svelte';
   //import svelteLogo from './assets/svelte.svg'
-  
-  $: innerWidth = 10;
-  
-  function changedInnerWidth(newWidth) {
-    // Test
-  }
-  
-  $: {
-    changedInnerWidth(innerWidth);
-  }
 </script>
-
-<svelte:window bind:innerWidth />
 
 <main>  
   <h1>Trilha inteligente!</h1>
   <p>
-    Jogo de trilha utilizando a busca cega DFS (Depth-First-Search), e MDP (Markov-Decision-Process).
+    Jogo de trilha utilizando busca competitiva MinMax (Depth-First-Search), e arvóre de decisão MDP (Markov-Decision-Process).
   </p>
   
   <div>
-    <Tabuleiro>
-    </Tabuleiro>
+    <TabuleiroTrilha>
+    </TabuleiroTrilha>
   </div>
 </main>
 
@@ -35,5 +23,9 @@
   div {
     margin: 0 auto;
     width: 100%;
+    min-height: 600px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
   }
 </style>

@@ -1,43 +1,50 @@
 <script lang="ts">
     import Peca from './Peca.svelte';
 
+    // Constantes
     const lado = 3;
+    const borda = 8;
+    const profundidade = 3;
+    const ladoTabuleiro = 500;
     const centro = Math.ceil(lado / 2) - 1;
 
-    const profundidade = 3;
+    // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
 
-    const tabuleiro = [];
-    const ladoTabuleiro = 500;
-
+    // Linhas que unem as matrizes
     const conectores = [
         {
-            l: 'calc(50% - 4px)',
+            l: `calc(50% - ${borda / 2}px)`,
             t: '0',
-            w: '8px',
-            h: '25%'
+            w: `${borda}px`,
+            h: `${distanciaCentro[2]}%`,
         },
         {
-            l: '75%',
-            t: 'calc(50% - 4px)',
-            w: '25%',
-            h: '8px'
+            l: `${100 - distanciaCentro[2]}%`,
+            t: `calc(50% - ${borda / 2}px)`,
+            w: `${distanciaCentro[2]}%`,
+            h: `${borda}px`,
         },
         {
-            l: 'calc(50% - 4px)',
-            t: '75%',
-            w: '8px',
-            h: '25%',
+            l: `calc(50% - ${borda / 2}px)`,
+            t: `${100 - distanciaCentro[2]}%`,
+            w: `${borda}px`,
+            h: `${distanciaCentro[2]}%`,
         },
         {
             l: '0',
-            t: 'calc(50% - 4px)',
-            w: '25%',
-            h: '8px'
+            t: `calc(50% - ${borda / 2}px)`,
+            w: `${distanciaCentro[2]}%`,
+            h: `${borda}px`,
         }
     ];
 
-    const linhas = [];
+    // Linhas que percorem a matriz
+    interface PosicaoLinha {
+        lado: number,
+        dist: number
+    }
+    const linhas: PosicaoLinha[] = [];
     for (let i = 0; i < profundidade; i++) {
         linhas.push({
             lado: ladoTabuleiro - (ladoTabuleiro * (distanciaCentro[i] / 100)) * 2,
@@ -45,54 +52,67 @@
         });
     }
 
+    /**
+     * Determina a posição da peça tendo os níveis internos como limitadores
+     * @param i Posição atual
+     * @param k Nível interno
+     */
+    function determinaPosicao(i: number, k: number): number {
+        return (50 * i + 
+                    (i == 1 
+                        ? 0 
+                        : (i < 1) 
+                            ? distanciaCentro[k] 
+                            : -distanciaCentro[k]))
+    }
+
+    // Peças do tabuleiro
+    interface PosicaoPeca {
+        x: string,
+        y: string
+    }
+    const tabuleiro: PosicaoPeca[][] = [];
     for(let i = 0, k = 0; i < lado * profundidade; i++) {
         if (i != 0 && i % profundidade == 0) {
             k++;
         }
+
+        const l = i % profundidade;
         tabuleiro.push([]);
  
         for(let j = 0; j < lado; j++) {
-            console.log("A", i, j);
-            if ((i % 3) == centro && j == centro) {
+            if (l == centro && j == centro) {
                 continue;
             }
 
             tabuleiro[i].push({
-                x: `${
-                    50 * (i % 3) + 
-                    ((i % 3) == 1 
-                        ? 0 
-                        : ((i % 3) < 1) 
-                            ? distanciaCentro[k] 
-                            : -distanciaCentro[k])
-                }%`,
-                y: `${
-                    50 * j + 
-                    (j == 1 
-                        ? 0 
-                        : (j < 1) 
-                            ? distanciaCentro[k] 
-                            : -distanciaCentro[k])
-                }%`,
+                x: `${determinaPosicao(l, k)}%`,
+                y: `${determinaPosicao(j, k)}%`,
             });
         }
     }
 </script>
 
 <div style="--lado:{ladoTabuleiro}px;">
+    <!-- PecasTabuleiro -->
     {#each tabuleiro as linha}
         {#each linha as peca}
             <Peca posX={peca.x} posY={peca.y}></Peca>
         {/each}
     {/each}
+    <!-- ./PecasTabuleiro -->
 
+    <!-- Linha -->
     {#each linhas as linha}
-        <div class="linha" style="--lado:{linha.lado}px;--dist:{linha.dist}%;"></div>
+        <div class="linha" style="--lado:{linha.lado}px;--dist:{linha.dist}%;--borda:{borda}px;"></div>
     {/each}
+    <!-- ./Linha -->
 
+    <!-- Conectores -->
     {#each conectores as con}
-        <div class="conectores" style="--l:{con.l};--w:{con.w};--t:{con.t};--h:{con.h};"></div>
+        <div class="conectores" style="--l:{con.l};--w:{con.w};--t:{con.t};--h:{con.h};--borda:{borda}px;"></div>
     {/each}
+    <!-- ./Conectores -->
 </div>
 
 <style>
@@ -103,7 +123,6 @@
     }
 
     .linha {
-        --borda: 8px;
         position: absolute;
         border: var(--borda) solid black;
         width: calc(var(--lado) - (var(--borda)));
