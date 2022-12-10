@@ -10,6 +10,33 @@
     const tabuleiro = [];
     const ladoTabuleiro = 500;
 
+    const conectores = [
+        {
+            l: 'calc(50% - 4px)',
+            t: '0',
+            w: '8px',
+            h: '25%'
+        },
+        {
+            l: '75%',
+            t: 'calc(50% - 4px)',
+            w: '25%',
+            h: '8px'
+        },
+        {
+            l: 'calc(50% - 4px)',
+            t: '75%',
+            w: '8px',
+            h: '25%',
+        },
+        {
+            l: '0',
+            t: 'calc(50% - 4px)',
+            w: '25%',
+            h: '8px'
+        }
+    ];
+
     const linhas = [];
     for (let i = 0; i < profundidade; i++) {
         linhas.push({
@@ -62,6 +89,10 @@
     {#each linhas as linha}
         <div class="linha" style="--lado:{linha.lado}px;--dist:{linha.dist}%;"></div>
     {/each}
+
+    {#each conectores as con}
+        <div class="conectores" style="--l:{con.l};--w:{con.w};--t:{con.t};--h:{con.h};"></div>
+    {/each}
 </div>
 
 <style>
@@ -70,6 +101,7 @@
         width: var(--lado);
         height: var(--lado);
     }
+
     .linha {
         --borda: 8px;
         position: absolute;
@@ -79,5 +111,13 @@
         z-index: 1;
         left: calc(var(--dist) - (var(--borda) / 2));
         top: calc(var(--dist) - (var(--borda) / 2));
+    }
+
+    .conectores {
+        background-color: #000;
+        width: var(--w);
+        height: var(--h);
+        left: var(--l);
+        top: var(--t);
     }
 </style>
