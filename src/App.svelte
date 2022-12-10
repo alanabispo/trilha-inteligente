@@ -1,10 +1,6 @@
 <script lang="ts">
   import Tabuleiro from './lib/Tabuleiro.svelte';
-  import svelteLogo from './assets/svelte.svg'
-  // import Counter from './lib/Counter.svelte'
-
-  const niveis = 3;
-  const lado = 3;
+  //import svelteLogo from './assets/svelte.svg'
   
   $: innerWidth = 10;
   
