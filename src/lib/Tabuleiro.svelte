@@ -1,12 +1,20 @@
 <script lang="ts">
+    import {NumJogador, TipoOcupacao} from './peca-estado';
+    import type {PecaEstado} from './peca-estado';
+
     import Peca from './Peca.svelte';
+
+    const displayNumero = false;
 
     // Constantes
     const lado = 3;
     const borda = 8;
     const profundidade = 3;
-    const ladoTabuleiro = 500;
+    const posicoesTotal = 24;
     const centro = Math.ceil(lado / 2) - 1;
+
+    // Tamanho fisico do lado do tabuleiro
+    const ladoTabuleiro = 500; // px 
 
     // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
@@ -66,13 +74,63 @@
                             : -distanciaCentro[k]))
     }
 
+    // Grafo - lista de adjacência - Contem os vizinhos
+    const grafo = [
+        // Primeiro anel
+        [1, 3],         // 0
+        [0, 2, 9],      // 1
+        [1, 4],         // 2
+        [0, 5, 11],     // 3
+        [2, 7, 12],     // 4
+        [3, 6],         // 5
+        [5, 7, 14],     // 6
+        [4, 6],         // 7
+        // Segundo anel
+        [9, 11],        // 8
+        [1, 8, 10, 17], // 9
+        [9, 12],        // 10
+        [3, 8, 13, 19], // 11
+        [4, 10, 15, 20],// 12
+        [11, 14],       // 13
+        [6, 13, 15, 22],// 14
+        [12, 14],       // 15
+        // Terceiro anel
+        [17, 19],       // 16
+        [9, 16, 18],    // 17
+        [17, 20],       // 18
+        [11, 16, 21],   // 19
+        [12, 18, 23],   // 20
+        [19, 22],       // 21
+        [14, 21, 23],   // 22
+        [20, 22],       // 23
+    ];
+
+    // Grafo - matriz de adjacência - Contém o estado do grafo
+    const grafoEstado:TipoOcupacao[][] = new Array(posicoesTotal)
+        .fill(-1)
+        .map(_ => new Array(posicoesTotal).fill(-1));
+    for (let i = 0; i < grafo.length; i++) {
+        for (const j of grafo[i]) {
+            grafoEstado[i][j] = TipoOcupacao.Vazio;
+        }
+    }
+
     // Peças do tabuleiro
+    const pecas: PecaEstado[] = new Array(posicoesTotal)
+        .fill(0)
+        .map(_ => ({
+            jogador: NumJogador.SemJogador
+        }));
+
+    // Posições das peças do tabuleiro
     interface PosicaoPeca {
         x: string,
-        y: string
+        y: string,
+        z: number,
+        estado: PecaEstado
     }
     const tabuleiro: PosicaoPeca[][] = [];
-    for(let i = 0, k = 0; i < lado * profundidade; i++) {
+    for(let i = 0, k = 0, z = 0; i < lado * profundidade; i++) {
         if (i != 0 && i % profundidade == 0) {
             k++;
         }
@@ -86,9 +144,12 @@
             }
 
             tabuleiro[i].push({
-                x: `${determinaPosicao(l, k)}%`,
-                y: `${determinaPosicao(j, k)}%`,
+                x: `${determinaPosicao(j, k)}%`,
+                y: `${determinaPosicao(l, k)}%`,
+                z: z,
+                estado: pecas[z]
             });
+            z++;
         }
     }
 </script>
@@ -99,7 +160,11 @@
     <!-- PecasTabuleiro -->
     {#each tabuleiro as linha}
         {#each linha as peca}
-            <Peca posX={peca.x} posY={peca.y}></Peca>
+            <Peca 
+                posX={peca.x} posY={peca.y} 
+                num={peca.z} estado={peca.estado}
+                displayNumero={displayNumero}
+            ></Peca>
         {/each}
     {/each}
     <!-- ./PecasTabuleiro -->
