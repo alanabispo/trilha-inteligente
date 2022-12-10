@@ -1,26 +1,41 @@
 <script lang="ts">
-    import {NumJogador} from './peca-estado';
+    import { createEventDispatcher } from 'svelte';
+
+    import {NumJogador, Turno} from './peca-estado';
     import type {PecaEstado} from './peca-estado';
+
+    const clickDispatch = createEventDispatcher();
 
     export let posX: string = '0%';
     export let posY: string = '0%';
     export let num: number = 0;
     export let estado: PecaEstado;
+    export let turno: Turno;
 
     export let displayNumero: boolean = false;
 
     const CorPecas = {
         [NumJogador.SemJogador]: 'white',
-        [NumJogador.Player1]: 'red',
-        [NumJogador.Player2]: 'green'
+        [NumJogador.Jogador1]: 'red',
+        [NumJogador.Jogador2]: 'green'
     }
 
     $: corPeca = CorPecas[estado.jogador];
 
     // Intercepta o click
     function handleClick(evt) {
-        estado.jogador = (estado.jogador + 1) % 3;
+        console.log('click', turno)
 
+        if (turno == Turno.Parado) return;
+
+        if (turno == Turno.Jogador1)
+            estado.jogador = NumJogador.Jogador1;
+        else
+            estado.jogador = NumJogador.Jogador2;
+
+        clickDispatch('clickPiece', {
+            num
+        });
     }
 </script>
 
@@ -49,5 +64,6 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        caret-color: transparent
     }
 </style>

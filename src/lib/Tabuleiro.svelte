@@ -1,8 +1,9 @@
 <script lang="ts">
-    import {NumJogador, TipoOcupacao} from './peca-estado';
+    import {NumJogador, TipoOcupacao, Turno} from './peca-estado';
     import type {PecaEstado} from './peca-estado';
 
     import Peca from './Peca.svelte';
+    import Placar from './Placar.svelte';
 
     const displayNumero = false;
 
@@ -18,6 +19,9 @@
 
     // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
+
+    // Jogo
+    export let turno: Turno;
 
     // Linhas que unem as matrizes
     const conectores = [
@@ -155,7 +159,7 @@
 </script>
 
 <!-- Tabuleiro -->
-<div style="--lado:{ladoTabuleiro}px;">
+<div class="tabuleiro" style="--lado:{ladoTabuleiro}px;">
 
     <!-- PecasTabuleiro -->
     {#each tabuleiro as linha}
@@ -164,6 +168,7 @@
                 posX={peca.x} posY={peca.y} 
                 num={peca.z} estado={peca.estado}
                 displayNumero={displayNumero}
+                turno={turno}
             ></Peca>
         {/each}
     {/each}
@@ -185,7 +190,7 @@
 <!-- ./Tabuleiro -->
 
 <style>
-    div {
+    .tabuleiro {
         position: absolute;
         width: var(--lado);
         height: var(--lado);
@@ -202,6 +207,7 @@
     }
 
     .conectores {
+        position: absolute;
         background-color: #000;
         width: var(--w);
         height: var(--h);

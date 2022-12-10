@@ -1,5 +1,11 @@
 <script lang="ts">
+  import { Turno } from './lib/peca-estado';
+  import Placar from './lib/Placar.svelte';
   import TabuleiroTrilha from './lib/Tabuleiro.svelte';
+
+  let turno: Turno = Turno.Parado;
+  
+
   //import svelteLogo from './assets/svelte.svg'
 </script>
 
@@ -10,8 +16,12 @@
     e arvóre de decisão <a href="https://en.wikipedia.org/wiki/Markov_decision_process">MDP</a> (Markov-Decision-Process).
   </p>
   
+  <!-- Placar -->
+  <Placar turno={turno}></Placar>
+  <!-- ./Placar -->
+
   <div>
-    <TabuleiroTrilha>
+    <TabuleiroTrilha turno={turno}>
     </TabuleiroTrilha>
   </div>
 </main>

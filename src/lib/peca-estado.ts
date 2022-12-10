@@ -1,8 +1,14 @@
 export enum NumJogador {
     SemJogador = 0,
-    Player1 = 1,
-    Player2
+    Jogador1,
+    Jogador2
 }
+
+export enum Turno {
+    Parado = 0,
+    Jogador1,
+    Jogador2
+};
 
 export enum TipoOcupacao {
     NaoUtilizada = -1,
@@ -14,4 +20,3 @@ export interface PecaEstado {
     jogador: NumJogador;
 }
 
-export type Turno = NumJogador.Player1 | NumJogador.Player2 ;
