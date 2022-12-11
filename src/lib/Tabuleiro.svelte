@@ -120,24 +120,29 @@
     }
 
     function handleClickPeca(evt) {
-        console.log('Peca clicaca', evt);
+        console.log('Peca clicada', evt);
     }
 
     const realce = new Array(posicoesTotal).fill(false)
     function onMudarEstado() {
-        tabuleiro = tabuleiro;
-        jogo = jogo;
-        let i = 0;
-        for(const redrawn of tt) {
-            redrawn();
-            realce[i++] = true;
+        jogo.mudarEstado();
+        for(let i = 0; i < posicoesTotal; i++) {
+            realce[i] = true;
         }
+
+        jogo = jogo;
     }
 
 </script>
 
 <!-- Placar -->
-<Placar on:mudarEstado={onMudarEstado} jogo={jogo}></Placar>
+<Placar 
+    on:mudarEstado={onMudarEstado} 
+    isJogoRunning={jogo.isJogoRunning}
+    turno={jogo.turno}
+    vitoriasJogador1={jogo.jogadores[0].vitorias}
+    vitoriasJogador2IA={jogo.jogadores[1].vitorias}
+></Placar>
 <!-- ./Placar -->
 
 <div class="container-tabuleiro">
@@ -150,12 +155,10 @@
             {#each linha as peca, i}
                 <Peca 
                     realce={realce[i]}
-                    handler={peca.handler}
                     on:clickPeca={handleClickPeca}
                     posX={peca.x} posY={peca.y} 
                     num={peca.n}
                     displayNumero={displayNumero}
-                    jogo={jogo}
                 ></Peca>
             {/each}
         {/each}

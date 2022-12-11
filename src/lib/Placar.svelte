@@ -1,19 +1,19 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-    
-    import type { Jogo } from './jogo';
-    
+        
     import MulherNegra from '../assets/mulher-negra.png';
     import Robo from '../assets/robo.png';
     import { Turno } from './tipos-basicos';
 
-    export let jogo: Jogo;
+    export let vitoriasJogador1 = 0;
+    export let vitoriasJogador2IA = 0;
+
+    export let isJogoRunning = false;
+    export let turno: Turno = Turno.Parado;
 
     const clickDispatch = createEventDispatcher();
 
     function handleClick() {
-        jogo.mudarEstado();
-        jogo = jogo;
         clickDispatch('mudarEstado', {});
     }
 </script>
@@ -28,13 +28,13 @@
             <p>Vitórias: 0</p>
         </div>
 
-        <div class:exibir={jogo.turno == Turno.Jogador1}> Sua vez!</div>
+        <div class:exibir={turno == Turno.Jogador1}> Sua vez!</div>
     </div>
     <!-- ./CardHumano -->
 
     <!-- BotaoJogo -->
-    <button class:pararJogo={jogo.isJogoRunning} on:click={handleClick}>
-        {#if jogo.isJogoRunning}
+    <button class:pararJogo={isJogoRunning} on:click={handleClick}>
+        {#if isJogoRunning}
             Parar!
         {:else}
             Iniciar!
@@ -44,7 +44,7 @@
 
     <!-- CardIA -->
     <div>
-        <div class:exibir={jogo.turno == Turno.Jogador2IA}> Vez oponente!</div>
+        <div class:exibir={turno == Turno.Jogador2IA}> Vez oponente!</div>
         
         <div class="nome-jogador">
             <p><b>IA P2</b></p>

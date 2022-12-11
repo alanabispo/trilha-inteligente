@@ -59,9 +59,11 @@ export class HandlerPeca {
  */
 export class Jogador {
     private _rodadaJogador: RodadaJogo;
+    private _vitorias: number;
 
     constructor() {
         this.resetarJogo();
+        this._vitorias = 0;
     }
 
     resetarJogo() {
@@ -70,6 +72,10 @@ export class Jogador {
 
     get rodadaJogador() {
         return this._rodadaJogador;
+    }
+
+    get vitorias() {
+        return this.vitorias;
     }
 }
 

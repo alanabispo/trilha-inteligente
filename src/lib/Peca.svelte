@@ -1,38 +1,23 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
 
-    import type { HandlerPeca, Jogo } from './jogo';
-    import {NumJogador, Turno} from './tipos-basicos';
+    import { CorPecas } from './constantes';
+    import {NumJogador} from './tipos-basicos';
 
     const clickDispatch = createEventDispatcher();
 
     export let posX: string = '0%';
     export let posY: string = '0%';
     export let num: number = 0;
-    export let handler: HandlerPeca;
-    export let jogo: Jogo;
 
     export let realce = false;
     export let displayNumero: boolean = false;
-
-    const CorPecas = {
-        [NumJogador.SemJogador]: 'white',
-        [NumJogador.Jogador1]: 'red',
-        [NumJogador.Jogador2IA]: 'green'
-    }
-
-    export let corPeca = CorPecas[handler.jogador];
+    export let corPeca = CorPecas[NumJogador.SemJogador];
 
     // Intercepta o click
     function handleClick(): void {
-        if (jogo.turno == Turno.Parado) return;
-
-        handler = handler;
-        corPeca = CorPecas[handler.jogador];
-
         clickDispatch('clickPeca', {
             num,
-            jogador: handler.jogador,
             corPeca
         });
     }
