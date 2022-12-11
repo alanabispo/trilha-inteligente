@@ -17,7 +17,7 @@
     const CorPecas = {
         [NumJogador.SemJogador]: 'white',
         [NumJogador.Jogador1]: 'red',
-        [NumJogador.Jogador2]: 'green'
+        [NumJogador.Jogador2IA]: 'green'
     }
 
     $: corPeca = CorPecas[estado.jogador];

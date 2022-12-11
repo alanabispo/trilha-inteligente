@@ -1,13 +1,13 @@
 export enum NumJogador {
     SemJogador = 0,
     Jogador1,
-    Jogador2
+    Jogador2IA
 }
 
 export enum Turno {
     Parado = 0,
     Jogador1,
-    Jogador2
+    Jogador2IA
 };
 
 export enum TipoOcupacao {
