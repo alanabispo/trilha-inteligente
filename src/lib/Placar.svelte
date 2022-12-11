@@ -25,7 +25,7 @@
         
         <div class="nome-jogador">
             <p><b>Humano P1</b></p>
-            <p>Vitórias: 0</p>
+            <p>Vitórias: {vitoriasJogador1}</p>
         </div>
 
         <div class:exibir={turno == Turno.Jogador1}> Sua vez!</div>
@@ -48,7 +48,7 @@
         
         <div class="nome-jogador">
             <p><b>IA P2</b></p>
-            <p>Vitórias: 0</p>
+            <p>Vitórias: {vitoriasJogador2IA}</p>
         </div>
         
         <div><img src="{Robo}" alt="robo representando inteligência artificial"></div>

@@ -60,10 +60,12 @@ export class HandlerPeca {
 export class Jogador {
     private _rodadaJogador: RodadaJogo;
     private _vitorias: number;
+    private _id: number;
 
-    constructor() {
+    constructor(id: number) {
         this.resetarJogo();
         this._vitorias = 0;
+        this._id = id;
     }
 
     resetarJogo() {
@@ -75,7 +77,11 @@ export class Jogador {
     }
 
     get vitorias() {
-        return this.vitorias;
+        return this._vitorias;
+    }
+
+    get id() {
+        return this.id;
     }
 }
 
@@ -84,11 +90,12 @@ export class Jogador {
  * performadas e pela interface com a IA
  */
 export class Jogo {    
-    public grafo: number[][];
+    public readonly grafo: number[][];
     public grafoEstado: TipoOcupacao[][];
     public pecas: HandlerPeca[];
     public jogadores: [Jogador, Jogador];
     
+    private _vitorias: [number, number];
     private _numRodadas: number;
     private _turno: Turno;
 
@@ -139,6 +146,9 @@ export class Jogo {
 
         // Inicializa o turno atual
         this._turno = Turno.Parado;
+
+        // Inicializa demais variaveis
+        this._vitorias = [0, 0];
     }
 
     get turno() {
@@ -153,6 +163,10 @@ export class Jogo {
         return this._turno != Turno.Parado;
     }
 
+    get vitorias() {
+        return this._vitorias;
+    }
+
     /**
      * Inicia um novo jogo
      */
@@ -162,8 +176,8 @@ export class Jogo {
         
         // Inicializa o momento de cada jogador
         this.jogadores = [
-            new Jogador(),
-            new Jogador(),
+            new Jogador(1),
+            new Jogador(2),
         ];
 
         // Preenche as ocupacoes do jogo
@@ -199,17 +213,26 @@ export class Jogo {
     }
 
     /**
-     * Troca o estado do jogo de ativo para inativo e vice-versa
+     * Limpa o tabuleiro
      */
-    mudarEstado(): void {
+    cleanTabuleiro(): void {
+        // TODO: limpa o tabuleiro
+    }
+
+    /**
+     * Troca o estado do jogo de ativo para inativo e vice-versa
+     * @returns retorna o novo estado do jogo
+     */
+    mudarEstado(): boolean {
         if (this._turno != Turno.Parado) {
             this._turno = Turno.Parado;
-            // TODO: Limpa o jogo
+            cleanTabuleiro();
             
-            return;
+            return false;
         }
 
         this.iniciarJogo();
+        return true;
     }
 
     /**

@@ -123,11 +123,27 @@
         console.log('Peca clicada', evt);
     }
 
-    const realce = new Array(posicoesTotal).fill(false)
+    // Realça as peças que podem ser movidas
+    const pecasRealcadas = new Array(posicoesTotal).fill(false);
+    function ativarRealceTodasPecas() {
+        for (let i = 0; i < posicoesTotal; i++) {
+            pecasRealcadas[i] = true;
+        }
+    }
+
+    function desativarRealceTodasPecas() {
+        for (let i = 0; i < posicoesTotal; i++) {
+            pecasRealcadas[i] = false;
+        }
+    }
+
     function onMudarEstado() {
-        jogo.mudarEstado();
-        for(let i = 0; i < posicoesTotal; i++) {
-            realce[i] = true;
+        const estado = jogo.mudarEstado();
+
+        if (estado) {
+            ativarRealceTodasPecas();
+        } else {
+            desativarRealceTodasPecas();
         }
 
         jogo = jogo;
@@ -140,8 +156,8 @@
     on:mudarEstado={onMudarEstado} 
     isJogoRunning={jogo.isJogoRunning}
     turno={jogo.turno}
-    vitoriasJogador1={jogo.jogadores[0].vitorias}
-    vitoriasJogador2IA={jogo.jogadores[1].vitorias}
+    vitoriasJogador1={jogo.vitorias[0]}
+    vitoriasJogador2IA={jogo.vitorias[0]}
 ></Placar>
 <!-- ./Placar -->
 
@@ -154,11 +170,12 @@
         {#each tabuleiro as linha}
             {#each linha as peca, i}
                 <Peca 
-                    realce={realce[i]}
                     on:clickPeca={handleClickPeca}
                     posX={peca.x} posY={peca.y} 
                     num={peca.n}
                     displayNumero={displayNumero}
+                    realce={pecasRealcadas[i]}
+                    
                 ></Peca>
             {/each}
         {/each}
