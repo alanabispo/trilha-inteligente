@@ -11,3 +11,6 @@ export const CorPecas = {
     [NumJogador.Jogador1]: Cores.Verde,
     [NumJogador.Jogador2IA]: Cores.Vermelho
 }
+
+const empateTotalRodadas = 80; // A regra original é 200
+const empateRodadaFinal = 10;

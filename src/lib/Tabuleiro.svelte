@@ -1,8 +1,9 @@
 <script lang="ts">
     import Placar from './Placar.svelte';
     import Peca from './Peca.svelte';
-    import type { ActionFunction } from './tipos-basicos';
+    import type { ActionFunction, EvtClickPeca } from './tipos-basicos';
     import { HandlerPeca, Jogo } from './jogo';
+    import { CorPecas } from './constantes';
 
     // Debug
     const displayNumero = false;
@@ -118,13 +119,17 @@
             z++;
         }
     }
+    
+    const pecasRealcadas = new Array(posicoesTotal).fill(false);
+    const corPecas = new Array(posicoesTotal).fill(CorPecas[0]);
 
-    function handleClickPeca(evt) {
+    function handleClickPeca(evt: CustomEvent) {
         console.log('Peca clicada', evt);
+        const evtDetails: EvtClickPeca = evt.detail; 
+        corPecas[evtDetails.num] = CorPecas[jogo.turno];
     }
 
     // Realça as peças que podem ser movidas
-    const pecasRealcadas = new Array(posicoesTotal).fill(false);
     function ativarRealceTodasPecas() {
         for (let i = 0; i < posicoesTotal; i++) {
             pecasRealcadas[i] = true;
@@ -175,6 +180,7 @@
                     num={peca.n}
                     displayNumero={displayNumero}
                     realce={pecasRealcadas[i]}
+                    corPeca={corPecas[i]}
                     
                 ></Peca>
             {/each}

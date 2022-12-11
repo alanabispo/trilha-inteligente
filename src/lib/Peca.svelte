@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte';
 
     import { CorPecas } from './constantes';
-    import {NumJogador} from './tipos-basicos';
+    import {NumJogador, type EvtClickPeca} from './tipos-basicos';
 
     const clickDispatch = createEventDispatcher();
 
@@ -19,7 +19,7 @@
         clickDispatch('clickPeca', {
             num,
             corPeca
-        });
+        } as EvtClickPeca);
     }
 </script>
 

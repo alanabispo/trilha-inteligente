@@ -216,7 +216,12 @@ export class Jogo {
      * Limpa o tabuleiro
      */
     cleanTabuleiro(): void {
-        // TODO: limpa o tabuleiro
+        // Preenche as ocupacoes do jogo
+        for (let i = 0; i < this.grafo.length; i++) {
+            for (const j of this.grafo[i]) {
+                this.grafoEstado[i][j] = TipoOcupacao.Vazio;
+            }
+        }
     }
 
     /**
@@ -226,7 +231,7 @@ export class Jogo {
     mudarEstado(): boolean {
         if (this._turno != Turno.Parado) {
             this._turno = Turno.Parado;
-            cleanTabuleiro();
+            this.cleanTabuleiro();
             
             return false;
         }

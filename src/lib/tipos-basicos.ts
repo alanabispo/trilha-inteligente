@@ -24,6 +24,11 @@ export enum RodadaJogo {
     Perdeu
 }
 
+export interface EvtClickPeca {
+    num: number;
+    corPeca: string;
+}
+
 export type ActionFunction = () => void;
 
 
