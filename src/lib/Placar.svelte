@@ -1,10 +1,15 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
     import { Turno, type EstadoJogo } from "./peca-estado";
 
     export let estadoJogo: EstadoJogo;
 
+    const clickDispatch = createEventDispatcher();
+
     function handleIniciar() {
         estadoJogo.turno = Turno.Jogador1;
+
+        clickDispatch('iniciarJogo', {});
     }
 </script>
 
