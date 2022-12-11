@@ -16,7 +16,20 @@ export enum TipoOcupacao {
     Ocupado
 }
 
+export enum RodadaJogo {
+    ColocarPecas,
+    MoverPecas,
+    FlutuarPecas,
+    Ganhou,
+    Perdeu
+}
+
+export interface EstadoJogo {
+    turno: Turno
+}
+
 export interface PecaEstado {
     jogador: NumJogador;
 }
+
 

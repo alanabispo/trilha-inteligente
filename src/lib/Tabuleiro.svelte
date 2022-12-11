@@ -1,9 +1,9 @@
 <script lang="ts">
-    import {NumJogador, TipoOcupacao, Turno} from './peca-estado';
+    import {NumJogador, TipoOcupacao, Turno, type EstadoJogo} from './peca-estado';
     import type {PecaEstado} from './peca-estado';
-
-    import Peca from './Peca.svelte';
+    
     import Placar from './Placar.svelte';
+    import Peca from './Peca.svelte';
 
     const displayNumero = false;
 
@@ -21,7 +21,9 @@
     const distanciaCentro = [0, 12.5, 25];
 
     // Jogo
-    export let turno: Turno;
+    const estadoJogo: EstadoJogo = {
+        turno: Turno.Parado
+    };
 
     // Linhas que unem as matrizes
     const conectores = [
@@ -110,7 +112,7 @@
     ];
 
     // Grafo - matriz de adjacência - Contém o estado do grafo
-    const grafoEstado:TipoOcupacao[][] = new Array(posicoesTotal)
+    const grafoEstado: TipoOcupacao[][] = new Array(posicoesTotal)
         .fill(-1)
         .map(_ => new Array(posicoesTotal).fill(-1));
     for (let i = 0; i < grafo.length; i++) {
@@ -130,7 +132,7 @@
     interface PosicaoPeca {
         x: string,
         y: string,
-        z: number,
+        n: number,
         estado: PecaEstado
     }
     const tabuleiro: PosicaoPeca[][] = [];
@@ -150,46 +152,68 @@
             tabuleiro[i].push({
                 x: `${determinaPosicao(j, k)}%`,
                 y: `${determinaPosicao(l, k)}%`,
-                z: z,
+                n: z,
                 estado: pecas[z]
             });
             z++;
         }
     }
+
+    function handleClickPeca() {
+        
+    }
 </script>
 
-<!-- Tabuleiro -->
-<div class="tabuleiro" style="--lado:{ladoTabuleiro}px;">
+<!-- Placar -->
+<Placar estadoJogo={estadoJogo}></Placar>
+<!-- ./Placar -->
 
-    <!-- PecasTabuleiro -->
-    {#each tabuleiro as linha}
-        {#each linha as peca}
-            <Peca 
-                posX={peca.x} posY={peca.y} 
-                num={peca.z} estado={peca.estado}
-                displayNumero={displayNumero}
-                turno={turno}
-            ></Peca>
+<div class="container-tabuleiro">
+
+    <!-- Tabuleiro -->
+    <div class="tabuleiro" style="--lado:{ladoTabuleiro}px;">
+
+        <!-- PecasTabuleiro -->
+        {#each tabuleiro as linha}
+            {#each linha as peca}
+                <Peca 
+                    on:clickPeca={handleClickPeca}
+                    posX={peca.x} posY={peca.y} 
+                    num={peca.n} estado={peca.estado}
+                    displayNumero={displayNumero}
+                    estadoJogo={estadoJogo}
+                ></Peca>
+            {/each}
         {/each}
-    {/each}
-    <!-- ./PecasTabuleiro -->
+        <!-- ./PecasTabuleiro -->
 
-    <!-- Linha -->
-    {#each linhas as linha}
-        <div class="linha" style="--lado:{linha.lado}px;--dist:{linha.dist}%;--borda:{borda}px;"></div>
-    {/each}
-    <!-- ./Linha -->
+        <!-- Linha -->
+        {#each linhas as linha}
+            <div class="linha" style="--lado:{linha.lado}px;--dist:{linha.dist}%;--borda:{borda}px;"></div>
+        {/each}
+        <!-- ./Linha -->
 
-    <!-- Conectores -->
-    {#each conectores as con}
-        <div class="conectores" style="--l:{con.l};--w:{con.w};--t:{con.t};--h:{con.h};--borda:{borda}px;"></div>
-    {/each}
-    <!-- ./Conectores -->
+        <!-- Conectores -->
+        {#each conectores as con}
+            <div class="conectores" style="--l:{con.l};--w:{con.w};--t:{con.t};--h:{con.h};--borda:{borda}px;"></div>
+        {/each}
+        <!-- ./Conectores -->
+
+    </div>
+    <!-- ./Tabuleiro -->
 
 </div>
-<!-- ./Tabuleiro -->
 
 <style>
+    .container-tabuleiro {
+        margin: 0 auto;
+        width: 100%;
+        min-height: 600px;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+    }
+
     .tabuleiro {
         position: absolute;
         width: var(--lado);
