@@ -24,10 +24,6 @@ export enum RodadaJogo {
     Perdeu
 }
 
-export interface EstadoJogo {
-    turno: Turno
-}
-
 export interface PecaEstado {
     jogador: NumJogador;
 }

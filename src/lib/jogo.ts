@@ -1,4 +1,10 @@
-import { NumJogador, TipoOcupacao, Turno, type EstadoJogo, type PecaEstado } from "./tipos-basicos";
+import { 
+    NumJogador, 
+    RodadaJogo, 
+    TipoOcupacao, 
+    Turno, 
+    type PecaEstado 
+} from "./tipos-basicos";
 
 /**
  * Representa as proximas posicoes de movimento
@@ -13,13 +19,30 @@ export interface ProximasPosicoes {
     tipo: TipoProximasPosicoes;
 }
 
+export enum EstadoFimJogo {
+    Jogador1Ganhou,
+    Jogador2Ganhou,
+    Empate,
+    FecharJogo
+}
+
 /**
  * Representa todos os estados de um jogador em especifico.
  * O jogador retem e organiza tudo necessário 
  */
 export class Jogador {
-    constructor() {
+    private _rodadaJogador: RodadaJogo;
 
+    constructor() {
+        this.resetarJogo();
+    }
+
+    resetarJogo() {
+        this._rodadaJogador = RodadaJogo.ColocarPecas;
+    }
+
+    get rodadaJogador() {
+        return this._rodadaJogador;
     }
 }
 
@@ -105,11 +128,33 @@ export class Jogo {
         return this._numRodadas;
     }
 
+    get isJogoRunning() {
+        return this._turno != Turno.Parado;
+    }
+
     /**
      * Inicia um novo jogo
      */
     iniciarJogo() {
 
+    }
+
+    /**
+     * Finaliza o jogo atual
+     */
+    finalizaJogo(estadoFim: EstadoFimJogo) {
+
+    }
+
+    /**
+     * Troca o estado do jogo de ativo para inativo e vice-versa
+     */
+    mudarEstado() {
+        if (this._turno == Turno.Parado) {
+            this._turno = Turno.Jogador1;
+        } else {
+            this._turno = Turno.Parado;
+        }
     }
 
     /**

@@ -1,31 +1,45 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
     import type { Jogo } from './jogo';
-    import { Turno, type EstadoJogo } from "./tipos-basicos";
 
     export let jogo: Jogo;
 
     const clickDispatch = createEventDispatcher();
 
-    function handleIniciar() {
-        jogo.iniciarJogo();
+    function handleClick() {
+        jogo.mudarEstado();
         clickDispatch('iniciarJogo', {});
+        console.log('haha', jogo.turno)
     }
 </script>
 
 <div>
-Turno = 
-{#if jogo.turno == Turno.Jogador1}
-Jogador1
-{:else if jogo.turno == Turno.Jogador2}
-Jogador2
-{:else}
-Jogo não iniciado
-{/if}
+    <div>Humano</div>
+    <button on:click={handleClick}>
+        {#if jogo.turno != true}
+            Iniciar!
+        {:else}
+            Parar!
+        {/if}
+    </button>
+    <div>IA</div> 
 </div>
 
-<button on:click={handleIniciar}>Iniciar</button>
-
 <style>
+    div {
+        display: flex;
+        width: 100%;
+        align-items: center;
+    }
 
+    div:nth-child(1) {
+    }
+
+    div:nth-child(2) {
+    }
+
+    div:nth-child(3) {
+        display: flex;
+        justify-content: right;
+    }
 </style>
