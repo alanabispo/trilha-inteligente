@@ -24,8 +24,6 @@ export enum RodadaJogo {
     Perdeu
 }
 
-export interface PecaEstado {
-    jogador: NumJogador;
-}
+export type ActionFunction = () => void;
 
 

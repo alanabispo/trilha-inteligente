@@ -2,8 +2,7 @@ import {
     NumJogador, 
     RodadaJogo, 
     TipoOcupacao, 
-    Turno, 
-    type PecaEstado 
+    Turno 
 } from "./tipos-basicos";
 
 /**
@@ -24,6 +23,34 @@ export enum EstadoFimJogo {
     Jogador2Ganhou,
     Empate,
     FecharJogo
+}
+
+export class HandlerPeca {
+    jogador: NumJogador;
+    realce: boolean;
+
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.realce = false;
+        this.jogador = NumJogador.SemJogador;
+    }
+
+    /**
+     * Ativa o realce da peça
+     */
+    ativaRealce(): void {
+        this.realce = true;
+    }
+
+    /**
+     * Desativa o realce da peça
+     */
+    desativaRealce(): void {
+        this.realce = false;
+    }
 }
 
 /**
@@ -53,7 +80,7 @@ export class Jogador {
 export class Jogo {    
     public grafo: number[][];
     public grafoEstado: TipoOcupacao[][];
-    public pecas: PecaEstado[];
+    public pecas: HandlerPeca[];
     public jogadores: [Jogador, Jogador];
     
     private _numRodadas: number;
@@ -61,13 +88,12 @@ export class Jogo {
 
     constructor(
         public posicoesTotal: number,
+        public redrawn:() => void
     ) {
         // Peças do tabuleiro
         this.pecas = new Array(posicoesTotal)
-        .fill(0)
-        .map(_ => ({
-            jogador: NumJogador.SemJogador
-        }));
+            .fill(0)
+            .map(_ => (new HandlerPeca()));
 
         // Grafo - lista de adjacência - Contem os vizinhos
         this.grafo = [
@@ -103,21 +129,10 @@ export class Jogo {
         // Grafo - matriz de adjacência - Contém o estado do grafo
         this.grafoEstado = new Array(posicoesTotal)
             .fill(-1)
-            .map(_ => new Array(posicoesTotal).fill(-1));
-        for (let i = 0; i < this.grafo.length; i++) {
-            for (const j of this.grafo[i]) {
-                this.grafoEstado[i][j] = TipoOcupacao.Vazio;
-            }
-        }
+            .map(_ => new Array(posicoesTotal).fill(TipoOcupacao.NaoUtilizada));
 
         // Inicializa o turno atual
         this._turno = Turno.Parado;
-
-        // Inicializa o momento de cada jogador
-        this.jogadores = [
-            new Jogador(),
-            new Jogador(),
-        ];
     }
 
     get turno() {
@@ -135,26 +150,60 @@ export class Jogo {
     /**
      * Inicia um novo jogo
      */
-    iniciarJogo() {
+    iniciarJogo(): void {
+        this._numRodadas = 0;
+        this._turno = Turno.Jogador1;
+        
+        // Inicializa o momento de cada jogador
+        this.jogadores = [
+            new Jogador(),
+            new Jogador(),
+        ];
 
+        // Preenche as ocupacoes do jogo
+        for (let i = 0; i < this.grafo.length; i++) {
+            for (const j of this.grafo[i]) {
+                this.grafoEstado[i][j] = TipoOcupacao.Vazio;
+            }
+        }
+
+        // Remove marcação de cor do jogador
+        this.pecas = this.pecas.map(_ => (new HandlerPeca()));
+
+        // Realça todas as peças
+        this.realcaTodasPecas();
+    }
+
+    /**
+     * Realça todas as peças do jogo
+     */
+    realcaTodasPecas(): void {
+        for (const peca of this.pecas) {
+            peca.ativaRealce();
+        }
+
+        this.redrawn();
     }
 
     /**
      * Finaliza o jogo atual
      */
-    finalizaJogo(estadoFim: EstadoFimJogo) {
+    finalizaJogo(estadoFim: EstadoFimJogo): void {
 
     }
 
     /**
      * Troca o estado do jogo de ativo para inativo e vice-versa
      */
-    mudarEstado() {
-        if (this._turno == Turno.Parado) {
-            this._turno = Turno.Jogador1;
-        } else {
+    mudarEstado(): void {
+        if (this._turno != Turno.Parado) {
             this._turno = Turno.Parado;
+            // TODO: Limpa o jogo
+            
+            return;
         }
+
+        this.iniciarJogo();
     }
 
     /**

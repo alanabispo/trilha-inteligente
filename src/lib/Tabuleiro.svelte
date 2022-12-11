@@ -1,8 +1,8 @@
 <script lang="ts">
     import Placar from './Placar.svelte';
     import Peca from './Peca.svelte';
-    import type { PecaEstado } from './tipos-basicos';
-    import { Jogo } from './jogo';
+    import type { ActionFunction } from './tipos-basicos';
+    import { HandlerPeca, Jogo } from './jogo';
 
     // Debug
     const displayNumero = false;
@@ -20,8 +20,17 @@
     // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
 
+    // força o redrawn
+    let tt: ActionFunction[] = new Array(posicoesTotal).fill(-1).map(_ => () => {});
+    function t() {
+        jogo = jogo;
+        for(let i = 0; i < posicoesTotal; i++) tt[i]();
+    }
+
+    // Cria o objeto principal do jogo
     let jogo = new Jogo(
-        posicoesTotal
+        posicoesTotal,
+        t
     );
 
     // Linhas que unem as matrizes
@@ -84,9 +93,9 @@
         x: string,
         y: string,
         n: number,
-        estado: PecaEstado
+        handler: HandlerPeca
     }
-    const tabuleiro: PosicaoPeca[][] = [];
+    let tabuleiro: PosicaoPeca[][] = [];
     for(let i = 0, k = 0, z = 0; i < lado * profundidade; i++) {
         if (i != 0 && i % profundidade == 0) {
             k++;
@@ -104,19 +113,27 @@
                 x: `${determinaPosicao(j, k)}%`,
                 y: `${determinaPosicao(l, k)}%`,
                 n: z,
-                estado: jogo.pecas[z]
+                handler: jogo.pecas[z]
             });
             z++;
         }
     }
 
-    function handleClickPeca() {
-        
+    function handleClickPeca(evt) {
+        console.log('Peca clicaca', evt);
     }
 
+    const realce = new Array(posicoesTotal).fill(false)
     function onMudarEstado() {
+        tabuleiro = tabuleiro;
         jogo = jogo;
+        let i = 0;
+        for(const redrawn of tt) {
+            redrawn();
+            realce[i++] = true;
+        }
     }
+
 </script>
 
 <!-- Placar -->
@@ -130,11 +147,13 @@
 
         <!-- PecasTabuleiro -->
         {#each tabuleiro as linha}
-            {#each linha as peca}
+            {#each linha as peca, i}
                 <Peca 
+                    realce={realce[i]}
+                    handler={peca.handler}
                     on:clickPeca={handleClickPeca}
                     posX={peca.x} posY={peca.y} 
-                    num={peca.n} estado={peca.estado}
+                    num={peca.n}
                     displayNumero={displayNumero}
                     jogo={jogo}
                 ></Peca>
