@@ -13,8 +13,8 @@
 
     function handleClick() {
         jogo.mudarEstado();
-        clickDispatch('iniciarJogo', {});
-        console.log('haha', jogo.turno)
+        jogo = jogo;
+        clickDispatch('mudarEstado', {});
     }
 </script>
 
@@ -33,18 +33,18 @@
     <!-- ./CardHumano -->
 
     <!-- BotaoJogo -->
-    <button on:click={handleClick}>
-        {#if jogo.isJogoRunning != true}
-            Iniciar!
-        {:else}
+    <button class:pararJogo={jogo.isJogoRunning} on:click={handleClick}>
+        {#if jogo.isJogoRunning}
             Parar!
+        {:else}
+            Iniciar!
         {/if}
     </button>
     <!-- ./BotaoJogo -->
 
     <!-- CardIA -->
     <div>
-        <div class:exibir={jogo.turno == Turno.Jogador1}> Vez oponente!</div>
+        <div class:exibir={jogo.turno == Turno.Jogador2IA}> Vez oponente!</div>
         
         <div class="nome-jogador">
             <p><b>IA P2</b></p>
@@ -57,10 +57,6 @@
 </div>
 
 <style>
-    .exibir {
-        opacity: 1;
-    }
-
     div {
         display: flex;
     }
@@ -84,7 +80,7 @@
         border: 1px solid #333;
         padding: 3px 8px;
         border-radius: 10px;
-        background-color: rgb(56, 153, 0);
+        background-color: #389900;
         color: #fff;
         font-weight: 700;
         opacity: 0;
@@ -94,7 +90,7 @@
         border: 1px solid #333;
         padding: 3px 8px;
         border-radius: 10px;
-        background-color: rgb(197, 60, 6);
+        background-color: #c53c06;
         color: #fff;
         font-weight: 700;
         opacity: 0;
@@ -107,6 +103,14 @@
         border-radius: 100%;
         border: 3px solid #333;
         padding: 2px;
+    }
+
+    div:nth-child(1) > div > img {
+        border-color: #3d9900;
+    }
+
+    div:nth-child(3) > div > img {
+        border-color: #d80606;
     }
 
     .nome-jogador {
@@ -134,5 +138,13 @@
     
     .nome-jogador > p:nth-child(1) {
         margin: 2px;
+    }
+
+    .exibir {
+        opacity: 1 !important;
+    }
+
+    .pararJogo {
+        background-color: #d80606;
     }
 </style>

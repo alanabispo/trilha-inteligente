@@ -20,7 +20,7 @@
     // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
 
-    const jogo = new Jogo(
+    let jogo = new Jogo(
         posicoesTotal
     );
 
@@ -113,10 +113,14 @@
     function handleClickPeca() {
         
     }
+
+    function onMudarEstado() {
+        jogo = jogo;
+    }
 </script>
 
 <!-- Placar -->
-<Placar jogo={jogo}></Placar>
+<Placar on:mudarEstado={onMudarEstado} jogo={jogo}></Placar>
 <!-- ./Placar -->
 
 <div class="container-tabuleiro">
