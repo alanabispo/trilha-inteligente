@@ -1,11 +1,51 @@
-import { TipoOcupacao } from "./tipos-basicos";
+import { NumJogador, TipoOcupacao, Turno, type EstadoJogo, type PecaEstado } from "./tipos-basicos";
 
+/**
+ * Representa as proximas posicoes de movimento
+ */
+export enum TipoProximasPosicoes {
+    Adjacentes,
+    QualquerLugar
+}
+
+export interface ProximasPosicoes {
+    posicoes: number[];
+    tipo: TipoProximasPosicoes;
+}
+
+/**
+ * Representa todos os estados de um jogador em especifico.
+ * O jogador retem e organiza tudo necessário 
+ */
+export class Jogador {
+    constructor() {
+
+    }
+}
+
+/**
+ * Classe principal do jogo, responsavel pelas acoes 
+ * performadas e pela interface com a IA
+ */
 export class Jogo {    
+    public grafo: number[][];
+    public grafoEstado: TipoOcupacao[][];
+    public pecas: PecaEstado[];
+    public jogadores: [Jogador, Jogador];
+    
+    private _numRodadas: number;
+    private _turno: Turno;
+
     constructor(
-        public grafo: number[][],
-        public grafoEstado: TipoOcupacao[][],
         public posicoesTotal: number,
     ) {
+        // Peças do tabuleiro
+        this.pecas = new Array(posicoesTotal)
+        .fill(0)
+        .map(_ => ({
+            jogador: NumJogador.SemJogador
+        }));
+
         // Grafo - lista de adjacência - Contem os vizinhos
         this.grafo = [
             // Primeiro anel
@@ -47,6 +87,36 @@ export class Jogo {
             }
         }
 
-        
+        // Inicializa o turno atual
+        this._turno = Turno.Parado;
+
+        // Inicializa o momento de cada jogador
+        this.jogadores = [
+            new Jogador(),
+            new Jogador(),
+        ];
+    }
+
+    get turno() {
+        return this._turno;
+    }
+
+    get numRodadas() {
+        return this._numRodadas;
+    }
+
+    /**
+     * Inicia um novo jogo
+     */
+    iniciarJogo() {
+
+    }
+
+    /**
+     * Retorna quais posi
+     * @param pos Posicao
+     */
+    getProximaPosicoesMovimento(pos: number): ProximasPosicoes {
+        return null;
     }
 }

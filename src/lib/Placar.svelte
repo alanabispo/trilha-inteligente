@@ -1,23 +1,23 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-    import { Turno, type EstadoJogo } from "./peca-estado";
+    import type { Jogo } from './jogo';
+    import { Turno, type EstadoJogo } from "./tipos-basicos";
 
-    export let estadoJogo: EstadoJogo;
+    export let jogo: Jogo;
 
     const clickDispatch = createEventDispatcher();
 
     function handleIniciar() {
-        estadoJogo.turno = Turno.Jogador1;
-
+        jogo.iniciarJogo();
         clickDispatch('iniciarJogo', {});
     }
 </script>
 
 <div>
 Turno = 
-{#if estadoJogo.turno == Turno.Jogador1}
+{#if jogo.turno == Turno.Jogador1}
 Jogador1
-{:else if estadoJogo.turno == Turno.Jogador2}
+{:else if jogo.turno == Turno.Jogador2}
 Jogador2
 {:else}
 Jogo não iniciado

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import {NumJogador, TipoOcupacao, Turno, type EstadoJogo, type PecaEstado} from './tipos-basicos';
-    
     import Placar from './Placar.svelte';
     import Peca from './Peca.svelte';
+    import type { PecaEstado } from './tipos-basicos';
+    import { Jogo } from './jogo';
 
     // Debug
     const displayNumero = false;
@@ -20,10 +20,9 @@
     // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
 
-    // Jogo
-    const estadoJogo: EstadoJogo = {
-        turno: Turno.Parado
-    };
+    const jogo = new Jogo(
+        posicoesTotal
+    );
 
     // Linhas que unem as matrizes
     const conectores = [
@@ -80,13 +79,6 @@
                             : -distanciaCentro[k]))
     }
 
-    // Peças do tabuleiro
-    const pecas: PecaEstado[] = new Array(posicoesTotal)
-        .fill(0)
-        .map(_ => ({
-            jogador: NumJogador.SemJogador
-        }));
-
     // Posições das peças do tabuleiro
     interface PosicaoPeca {
         x: string,
@@ -112,7 +104,7 @@
                 x: `${determinaPosicao(j, k)}%`,
                 y: `${determinaPosicao(l, k)}%`,
                 n: z,
-                estado: pecas[z]
+                estado: jogo.pecas[z]
             });
             z++;
         }
@@ -124,7 +116,7 @@
 </script>
 
 <!-- Placar -->
-<Placar estadoJogo={estadoJogo}></Placar>
+<Placar jogo={jogo}></Placar>
 <!-- ./Placar -->
 
 <div class="container-tabuleiro">
@@ -140,7 +132,7 @@
                     posX={peca.x} posY={peca.y} 
                     num={peca.n} estado={peca.estado}
                     displayNumero={displayNumero}
-                    estadoJogo={estadoJogo}
+                    jogo={jogo}
                 ></Peca>
             {/each}
         {/each}
