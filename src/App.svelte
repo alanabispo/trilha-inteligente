@@ -1,7 +1,5 @@
 <script lang="ts">
   import TabuleiroTrilha from './lib/Tabuleiro.svelte';
-
-  //import svelteLogo from './assets/svelte.svg'
 </script>
 
 <main>  
@@ -18,6 +16,6 @@
 
 <style>
   p {
-    margin: 50px;
+    margin: 25px;
   }
 </style>

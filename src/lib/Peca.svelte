@@ -1,8 +1,8 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-    import type { Jogo } from './jogo';
 
-    import {NumJogador, Turno, type EstadoJogo, type PecaEstado} from './tipos-basicos';
+    import type { Jogo } from './jogo';
+    import {NumJogador, Turno, type PecaEstado} from './tipos-basicos';
 
     const clickDispatch = createEventDispatcher();
 
@@ -26,23 +26,27 @@
     function handleClick() {
         if (jogo.turno == Turno.Parado ) return;
 
-        if (jogo.turno == Turno.Jogador1){
-            estado.jogador = NumJogador.Jogador1;
-        }
-        else {
-            estado.jogador = NumJogador.Jogador2;
-        } 
-
         clickDispatch('clickPeca', {
             num,
             jogador: estado.jogador
         });
     }
+
+    let realce = false;
+    function ativaRealce() {
+        realce = true;
+    }
+
+    function desativaRealce() {
+        realce = false;
+    }
 </script>
 
 <!-- Peca -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div on:click={handleClick} style='--posX:{posX};--posY:{posY};--stateColor:{corPeca}'>
+<div on:click={handleClick} 
+    class:realce="{realce}"
+    style='--posX:{posX};--posY:{posY};--stateColor:{corPeca}'>
     {#if displayNumero}
         {num}
     {/if}
@@ -65,6 +69,22 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        caret-color: transparent
+        caret-color: transparent;
+    }
+
+    .realce {
+        box-shadow: 0px 0px 3px 5px #57FF00;
+        transition: box-shadow 0.3s ease-in-out;
+        cursor: pointer;
+    }
+
+    .realce:hover {
+        box-shadow:0px 0px 3px 7px #226400;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .realce:active {
+        box-shadow: 0px 0px 3px 7px #7af03f;
+        transition: box-shadow 0.1s ease-in-out;
     }
 </style>
