@@ -21,17 +21,9 @@
     // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
 
-    // força o redrawn
-    let tt: ActionFunction[] = new Array(posicoesTotal).fill(-1).map(_ => () => {});
-    function t() {
-        jogo = jogo;
-        for(let i = 0; i < posicoesTotal; i++) tt[i]();
-    }
-
     // Cria o objeto principal do jogo
     let jogo = new Jogo(
         posicoesTotal,
-        t
     );
 
     // Linhas que unem as matrizes
@@ -127,6 +119,7 @@
         console.log('Peca clicada', evt);
         const evtDetails: EvtClickPeca = evt.detail; 
         corPecas[evtDetails.num] = CorPecas[jogo.turno];
+        jogo.executarClick();
     }
 
     // Realça as peças que podem ser movidas
@@ -142,8 +135,16 @@
         }
     }
 
+    function limpaEstadoTodasPecas() {
+        for (let i = 0; i < posicoesTotal; i++) {
+            corPecas[i] = CorPecas[0];
+        }
+    }
+
     function onMudarEstado() {
         const estado = jogo.mudarEstado();
+
+        limpaEstadoTodasPecas();
 
         if (estado) {
             ativarRealceTodasPecas();
@@ -173,14 +174,14 @@
 
         <!-- PecasTabuleiro -->
         {#each tabuleiro as linha}
-            {#each linha as peca, i}
+            {#each linha as peca}
                 <Peca 
                     on:clickPeca={handleClickPeca}
                     posX={peca.x} posY={peca.y} 
                     num={peca.n}
                     displayNumero={displayNumero}
-                    realce={pecasRealcadas[i]}
-                    corPeca={corPecas[i]}
+                    realce={pecasRealcadas[peca.n]}
+                    corPeca={corPecas[peca.n]}
                     
                 ></Peca>
             {/each}

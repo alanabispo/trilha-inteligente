@@ -100,8 +100,7 @@ export class Jogo {
     private _turno: Turno;
 
     constructor(
-        public posicoesTotal: number,
-        public redrawn:() => void
+        public posicoesTotal: number
     ) {
         // Peças do tabuleiro
         this.pecas = new Array(posicoesTotal)
@@ -188,27 +187,15 @@ export class Jogo {
         }
 
         // Remove marcação de cor do jogador
-        this.pecas = this.pecas.map(_ => (new HandlerPeca()));
-
-        // Realça todas as peças
-        this.realcaTodasPecas();
-    }
-
-    /**
-     * Realça todas as peças do jogo
-     */
-    realcaTodasPecas(): void {
-        for (const peca of this.pecas) {
-            peca.ativaRealce();
-        }
-
-        this.redrawn();
-    }
+        this.pecas = this.pecas.map(_ => (new HandlerPeca()));    }
 
     /**
      * Finaliza o jogo atual
      */
     finalizaJogo(estadoFim: EstadoFimJogo): void {
+    }
+
+    executarClick(): void {
 
     }
 
