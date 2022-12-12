@@ -25,31 +25,15 @@ export enum EstadoFimJogo {
     FecharJogo
 }
 
-export class HandlerPeca {
+export class DadosPeca {
     jogador: NumJogador;
-    realce: boolean;
 
     constructor() {
         this.init();
     }
 
     init() {
-        this.realce = false;
         this.jogador = NumJogador.SemJogador;
-    }
-
-    /**
-     * Ativa o realce da peça
-     */
-    ativaRealce(): void {
-        this.realce = true;
-    }
-
-    /**
-     * Desativa o realce da peça
-     */
-    desativaRealce(): void {
-        this.realce = false;
     }
 }
 
@@ -92,7 +76,7 @@ export class Jogador {
 export class Jogo {    
     public readonly grafo: number[][];
     public grafoEstado: TipoOcupacao[][];
-    public pecas: HandlerPeca[];
+    public pecas: DadosPeca[];
     public jogadores: [Jogador, Jogador];
     
     private _vitorias: [number, number];
@@ -105,7 +89,7 @@ export class Jogo {
         // Peças do tabuleiro
         this.pecas = new Array(posicoesTotal)
             .fill(0)
-            .map(_ => (new HandlerPeca()));
+            .map(_ => (new DadosPeca()));
 
         // Grafo - lista de adjacência - Contem os vizinhos
         this.grafo = [
@@ -187,7 +171,7 @@ export class Jogo {
         }
 
         // Remove marcação de cor do jogador
-        this.pecas = this.pecas.map(_ => (new HandlerPeca()));    }
+        this.pecas = this.pecas.map(_ => (new DadosPeca()));    }
 
     /**
      * Finaliza o jogo atual
@@ -195,8 +179,26 @@ export class Jogo {
     finalizaJogo(estadoFim: EstadoFimJogo): void {
     }
 
-    executarClick(): void {
+    /**
+     * Executa um click em uma peça
+     */
+    executarClick(num: number): boolean {
+        if (this._turno == Turno.Parado) false;
 
+        if (this.pecas[num].jogador != NumJogador.SemJogador) {
+            return false;
+        }
+
+        if (this._turno == Turno.Jogador1) {
+            this.pecas[num].jogador = NumJogador.Jogador1;
+            this._turno = Turno.Jogador2IA;
+        } else {
+            this.pecas[num].jogador = NumJogador.Jogador2IA;
+            this._turno = Turno.Jogador1;
+        }
+
+        this._numRodadas++;
+        return true;
     }
 
     /**

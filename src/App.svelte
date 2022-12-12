@@ -7,8 +7,7 @@
   <p>
     Jogo de <a href="http://www.tabuleirocriativo.com.br/post_trilha.html">Trilha</a> 
     utilizando busca competitiva <a href="https://en.wikipedia.org/wiki/Minimax">MinMax</a>, 
-    e arvóre de decisão <a href="https://en.wikipedia.org/wiki/Markov_decision_process">MDP</a> 
-    (Markov-Decision-Process).
+    com <a href="https://pt.wikipedia.org/wiki/Poda_(computa%C3%A7%C3%A3o)">poda alfa-beta</a>.
   </p>
   
   <TabuleiroTrilha></TabuleiroTrilha>

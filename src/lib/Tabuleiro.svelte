@@ -1,8 +1,8 @@
 <script lang="ts">
     import Placar from './Placar.svelte';
     import Peca from './Peca.svelte';
-    import type { ActionFunction, EvtClickPeca } from './tipos-basicos';
-    import { HandlerPeca, Jogo } from './jogo';
+    import { Turno, type ActionFunction, type EvtClickPeca } from './tipos-basicos';
+    import { DadosPeca, Jogo } from './jogo';
     import { CorPecas } from './constantes';
 
     // Debug
@@ -86,7 +86,7 @@
         x: string,
         y: string,
         n: number,
-        handler: HandlerPeca
+        handler: DadosPeca
     }
     let tabuleiro: PosicaoPeca[][] = [];
     for(let i = 0, k = 0, z = 0; i < lado * profundidade; i++) {
@@ -115,33 +115,38 @@
     const pecasRealcadas = new Array(posicoesTotal).fill(false);
     const corPecas = new Array(posicoesTotal).fill(CorPecas[0]);
 
-    function handleClickPeca(evt: CustomEvent) {
-        console.log('Peca clicada', evt);
-        const evtDetails: EvtClickPeca = evt.detail; 
-        corPecas[evtDetails.num] = CorPecas[jogo.turno];
-        jogo.executarClick();
-    }
 
-    // Realça as peças que podem ser movidas
-    function ativarRealceTodasPecas() {
+    // Realça todas as peças que podem ser movidas
+    function ativarRealceTodasPecas(): void {
         for (let i = 0; i < posicoesTotal; i++) {
-            pecasRealcadas[i] = true;
+            if (corPecas[i] == CorPecas[0]) {
+                pecasRealcadas[i] = true;
+            }
         }
     }
 
-    function desativarRealceTodasPecas() {
+    // Remove o realce de todas as peças
+    function desativarRealceTodasPecas(): void {
         for (let i = 0; i < posicoesTotal; i++) {
             pecasRealcadas[i] = false;
         }
     }
 
-    function limpaEstadoTodasPecas() {
+    function ativarRealceAdjacentes(num: number): void {
+        //const pecasAdjacentes = jogo.getAdjacentes();
+
+
+    }
+
+    // Deixa as peças com a mesma cor inicial
+    function limpaEstadoTodasPecas(): void {
         for (let i = 0; i < posicoesTotal; i++) {
             corPecas[i] = CorPecas[0];
         }
     }
 
-    function onMudarEstado() {
+    // Toda vez que se desejar reiniciar um jogo
+    function onMudarEstado(): void {
         const estado = jogo.mudarEstado();
 
         limpaEstadoTodasPecas();
@@ -153,6 +158,27 @@
         }
 
         jogo = jogo;
+        novoTurno = jogo.turno;
+    }
+
+    let novoTurno = jogo.turno;
+
+    function handleClickPeca(evt: CustomEvent): void {
+        const evtDetails: EvtClickPeca = evt.detail;
+        
+        const turnoAtual = jogo.turno;
+
+        if (jogo.executarClick(evtDetails.num)) {
+            corPecas[evtDetails.num] = CorPecas[turnoAtual];
+        }
+
+        novoTurno = jogo.turno;
+
+        if (jogo.turno == Turno.Jogador1) {
+            ativarRealceTodasPecas();
+        } else {
+            desativarRealceTodasPecas();
+        }
     }
 
 </script>
@@ -161,7 +187,7 @@
 <Placar 
     on:mudarEstado={onMudarEstado} 
     isJogoRunning={jogo.isJogoRunning}
-    turno={jogo.turno}
+    turno={novoTurno}
     vitoriasJogador1={jogo.vitorias[0]}
     vitoriasJogador2IA={jogo.vitorias[0]}
 ></Placar>
