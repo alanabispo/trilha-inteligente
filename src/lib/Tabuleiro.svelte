@@ -1,7 +1,7 @@
 <script lang="ts">
     import Placar from './Placar.svelte';
     import Peca from './Peca.svelte';
-    import { Turno, type ActionFunction, type EvtClickPeca } from './tipos-basicos';
+    import { RodadaJogo, Turno, type EvtClickPeca } from './tipos-basicos';
     import { DadosPeca, Jogo } from './jogo';
     import { CorPecas, Mensagens } from './constantes';
 
@@ -175,17 +175,23 @@
         
         const turnoAtual = jogo.turno;
 
-        if (jogo.executarClick(evtDetails.num)) {
-            corPecas[evtDetails.num] = CorPecas[turnoAtual];
+        const [res, [msg1, msg2]] = jogo.executarClick(evtDetails.num);
+        if (!res) {
+            return;
         }
+
+        corPecas[evtDetails.num] = CorPecas[turnoAtual];
 
         novoTurno = jogo.turno;
 
-        if (jogo.turno == Turno.Jogador1) {
+        if (jogo.turno == Turno.Jogador1 && jogo.jogadores[0].rodadaJogador != RodadaJogo.MoverPecas) {
             ativarRealceTodasPecas();
         } else {
             desativarRealceTodasPecas();
         }
+
+        msgP1 = msg1 as any;
+        msgP2 = msg2 as any;
     }
 
 </script>

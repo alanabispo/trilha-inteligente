@@ -1,3 +1,4 @@
+import { Mensagens } from "./constantes";
 import { 
     NumJogador, 
     RodadaJogo, 
@@ -27,9 +28,11 @@ export enum EstadoFimJogo {
 
 export class DadosPeca {
     jogador: NumJogador;
+    selecionada: boolean;
 
-    constructor() {
+    constructor(public adjacentes: number[]) {
         this.init();
+        this.selecionada = false;
     }
 
     init() {
@@ -42,26 +45,21 @@ export class DadosPeca {
  * O jogador retem e organiza tudo necessário 
  */
 export class Jogador {
-    private _rodadaJogador: RodadaJogo;
-    private _vitorias: number;
     private _id: number;
+    public rodadaJogador: RodadaJogo;
+    public numRodadas: number;
+    public pecasDisponiveis: number;
 
     constructor(id: number) {
         this.resetarJogo();
-        this._vitorias = 0;
         this._id = id;
+        this.numRodadas = 0;
     }
 
     resetarJogo() {
-        this._rodadaJogador = RodadaJogo.ColocarPecas;
-    }
-
-    get rodadaJogador() {
-        return this._rodadaJogador;
-    }
-
-    get vitorias() {
-        return this._vitorias;
+        this.rodadaJogador = RodadaJogo.ColocarPecas;
+        this.numRodadas = 0;
+        this.pecasDisponiveis = 0;
     }
 
     get id() {
@@ -78,6 +76,7 @@ export class Jogo {
     public grafoEstado: TipoOcupacao[][];
     public pecas: DadosPeca[];
     public jogadores: [Jogador, Jogador];
+    public pecaSelecionada: number;
     
     private _numRodadas: number;
     private _turno: Turno;
@@ -85,11 +84,6 @@ export class Jogo {
     constructor(
         public posicoesTotal: number
     ) {
-        // Peças do tabuleiro
-        this.pecas = new Array(posicoesTotal)
-            .fill(0)
-            .map(_ => (new DadosPeca()));
-
         // Grafo - lista de adjacência - Contem os vizinhos
         this.grafo = [
             // Primeiro anel
@@ -121,6 +115,11 @@ export class Jogo {
             [20, 22],       // 23
         ];
 
+        // Peças do tabuleiro
+        this.pecas = new Array(posicoesTotal)
+            .fill(0)
+            .map((_, i) => (new DadosPeca(this.grafo[i])));
+
         // Grafo - matriz de adjacência - Contém o estado do grafo
         this.grafoEstado = new Array(posicoesTotal)
             .fill(-1)
@@ -128,6 +127,7 @@ export class Jogo {
 
         // Inicializa o turno atual
         this._turno = Turno.Parado;
+        this.pecaSelecionada = -1;
     }
 
     get turno() {
@@ -141,7 +141,7 @@ export class Jogo {
     get isJogoRunning() {
         return this._turno != Turno.Parado;
     }
-    
+
     /**
      * Inicia um novo jogo
      */
@@ -163,7 +163,8 @@ export class Jogo {
         }
 
         // Remove marcação de cor do jogador
-        this.pecas = this.pecas.map(_ => (new DadosPeca()));    }
+        this.pecas = this.pecas.map((_, i) => (new DadosPeca(this.grafo[i])));    
+    }
 
     /**
      * Finaliza o jogo atual
@@ -174,23 +175,79 @@ export class Jogo {
     /**
      * Executa um click em uma peça
      */
-    executarClick(num: number): boolean {
+    executarClick(num: number): [boolean, [string, string]] {
         if (this._turno == Turno.Parado) false;
 
-        if (this.pecas[num].jogador != NumJogador.SemJogador) {
-            return false;
-        }
-
         if (this._turno == Turno.Jogador1) {
+            if (
+                this.jogadores[0].rodadaJogador == RodadaJogo.MoverPecas
+            ) {
+                if (this.pecaSelecionada >= 0 && num != this.pecaSelecionada &&
+                    this.pecas[num].jogador != NumJogador.Jogador1
+                ) {
+                    return [false, ['', '']];
+                } else if (this.pecaSelecionada >= 0 && num == this.pecaSelecionada) {
+                    return [false, ['', '']]; 
+                } else if (this)
+
+                return [false, ['', '']];
+            } else if (this.jogadores[0].rodadaJogador == RodadaJogo.FlutuarPecas) {
+                
+                
+                return [false, ['', '']];
+            } else {
+                if (this.pecas[num].jogador != NumJogador.SemJogador) {
+                    return [false, ['', '']];
+                }
+            }
+
+            this.jogadores[0].pecasDisponiveis++;
+            this.jogadores[0].numRodadas++;
             this.pecas[num].jogador = NumJogador.Jogador1;
             this._turno = Turno.Jogador2IA;
         } else {
+            if (
+                this.jogadores[1].rodadaJogador == RodadaJogo.MoverPecas ||
+                this.jogadores[1].rodadaJogador == RodadaJogo.FlutuarPecas
+            ) {
+                [false, ['', '']];
+            } else {
+                if (this.pecas[num].jogador != NumJogador.SemJogador) {
+                    return [false, ['', '']];
+                }
+            }
+
+            this.jogadores[1].pecasDisponiveis++;
+            this.jogadores[1].numRodadas++;
             this.pecas[num].jogador = NumJogador.Jogador2IA;
             this._turno = Turno.Jogador1;
         }
 
         this._numRodadas++;
-        return true;
+
+        let msg1, msg2;
+
+        if (this.jogadores[0].numRodadas < 9) {
+            msg1 = Mensagens.Coloca;
+        } else if (this.jogadores[0].numRodadas >= 9 && this.jogadores[0].pecasDisponiveis > 3) {
+            msg1 = Mensagens.Move;
+            this.jogadores[0].rodadaJogador = RodadaJogo.MoverPecas;
+        } else {
+            msg1 = Mensagens.Voa;
+            this.jogadores[0].rodadaJogador = RodadaJogo.FlutuarPecas;
+        }
+
+        if (this.jogadores[1].numRodadas < 9) {
+            msg2 = Mensagens.Coloca;
+        } else if (this.jogadores[1].numRodadas >= 9 && this.jogadores[1].pecasDisponiveis > 3) {
+            msg2 = Mensagens.Move;
+            this.jogadores[1].rodadaJogador = RodadaJogo.MoverPecas;
+        } else {
+            msg2 = Mensagens.Voa;
+            this.jogadores[1].rodadaJogador = RodadaJogo.FlutuarPecas;
+        }
+
+        return [true, [msg1, msg2]];
     }
 
     /**
