@@ -1,3 +1,5 @@
+import type { DadosPeca } from "./jogo";
+
 export enum NumJogador {
     SemJogador = 0,
     Jogador1,
@@ -19,9 +21,7 @@ export enum TipoOcupacao {
 export enum RodadaJogo {
     ColocarPecas,
     MoverPecas,
-    FlutuarPecas,
-    Ganhou,
-    Perdeu
+    FlutuarPecas
 }
 
 export interface EvtClickPeca {
@@ -31,4 +31,14 @@ export interface EvtClickPeca {
 
 export type ActionFunction = () => void;
 
+export interface PosicaoLinha {
+    lado: number,
+    dist: number
+}
 
+export interface PosicaoPeca {
+    x: string,
+    y: string,
+    n: number,
+    handler: DadosPeca
+}

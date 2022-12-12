@@ -1,12 +1,13 @@
 <script lang="ts">
     import Placar from './Placar.svelte';
     import Peca from './Peca.svelte';
-    import { RodadaJogo, Turno, type EvtClickPeca } from './tipos-basicos';
-    import { DadosPeca, Jogo } from './jogo';
+    //import { RodadaJogo, Turno, type EvtClickPeca, type PosicaoLinha, type PosicaoPeca } from './tipos-basicos';
+    import { Jogo } from './jogo';
     import { CorPecas, Mensagens } from './constantes';
+    import type { PosicaoLinha, PosicaoPeca } from './tipos-basicos';
 
     // Debug
-    const displayNumero = false;
+    const displayNumero = true;
 
     // Constantes
     const lado = 3;
@@ -20,10 +21,6 @@
 
     // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
-
-    let msgP1: Mensagens = Mensagens.Aguardando;
-    let msgP2: Mensagens = Mensagens.Aguardando;
-
     // Cria o objeto principal do jogo
     let jogo = new Jogo(
         posicoesTotal,
@@ -57,12 +54,20 @@
         }
     ];
 
-    // Linhas que percorem a matriz
-    interface PosicaoLinha {
-        lado: number,
-        dist: number
-    }
     const linhas: PosicaoLinha[] = [];
+
+    const pecasSelecionada: boolean[] = new Array(posicoesTotal).fill(false);
+    const pecasRealcadas: boolean[] = new Array(posicoesTotal).fill(false);
+    const corPecas = new Array(posicoesTotal).fill(CorPecas[0]);
+    
+    let novoTurno = jogo.turno;
+
+    let tabuleiro: PosicaoPeca[][] = [];
+    
+    let msgP1: Mensagens = Mensagens.Aguardando;
+    let msgP2: Mensagens = Mensagens.Aguardando;
+
+    // Linhas que percorem a matriz
     for (let i = 0; i < profundidade; i++) {
         linhas.push({
             lado: ladoTabuleiro - (ladoTabuleiro * (distanciaCentro[i] / 100)) * 2,
@@ -85,13 +90,6 @@
     }
 
     // Posições das peças do tabuleiro
-    interface PosicaoPeca {
-        x: string,
-        y: string,
-        n: number,
-        handler: DadosPeca
-    }
-    let tabuleiro: PosicaoPeca[][] = [];
     for(let i = 0, k = 0, z = 0; i < lado * profundidade; i++) {
         if (i != 0 && i % profundidade == 0) {
             k++;
@@ -114,10 +112,6 @@
             z++;
         }
     }
-    
-    const pecasRealcadas = new Array(posicoesTotal).fill(false);
-    const corPecas = new Array(posicoesTotal).fill(CorPecas[0]);
-
 
     // Realça todas as peças que podem ser movidas
     function ativarRealceTodasPecas(): void {
@@ -135,10 +129,11 @@
         }
     }
 
-    function ativarRealceAdjacentes(num: number): void {
-        //const pecasAdjacentes = jogo.getAdjacentes();
-
-
+    // Ativa realce nas peças adjacentes
+    function ativarRealceAdjacentes(adjacentes: number[]): void {
+        for (const adjacente of adjacentes) {
+            pecasRealcadas[adjacente] = true;
+        }
     }
 
     // Deixa as peças com a mesma cor inicial
@@ -168,9 +163,8 @@
         novoTurno = jogo.turno;
     }
 
-    let novoTurno = jogo.turno;
-
     function handleClickPeca(evt: CustomEvent): void {
+        /*
         const evtDetails: EvtClickPeca = evt.detail;
         
         const turnoAtual = jogo.turno;
@@ -192,6 +186,7 @@
 
         msgP1 = msg1 as any;
         msgP2 = msg2 as any;
+        */
     }
 
 </script>
@@ -221,7 +216,7 @@
                     displayNumero={displayNumero}
                     realce={pecasRealcadas[peca.n]}
                     corPeca={corPecas[peca.n]}
-                    
+                    seleciona={pecasSelecionada[peca.n]}
                 ></Peca>
             {/each}
         {/each}

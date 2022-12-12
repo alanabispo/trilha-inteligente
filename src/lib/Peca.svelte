@@ -11,6 +11,7 @@
     export let num: number = 0;
 
     export let realce = false;
+    export let seleciona = false;
     export let displayNumero: boolean = false;
     export let corPeca = CorPecas[NumJogador.SemJogador];
 
@@ -27,6 +28,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div on:click={handleClick} 
     class:realce="{realce}"
+    class:seleciona="{seleciona}"
     style='--posX:{posX};--posY:{posY};--stateColor:{corPeca}'>
     {#if displayNumero}
         {num}
@@ -57,6 +59,11 @@
         box-shadow: 0px 0px 3px 5px #57FF00;
         transition: box-shadow 0.3s ease-in-out;
         cursor: pointer;
+    }
+
+    .seleciona {
+        box-shadow: 0px 0px 3px 5px #0655ff;
+        transition: box-shadow 0.3s ease-in-out;
     }
 
     .realce:hover {

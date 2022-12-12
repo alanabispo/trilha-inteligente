@@ -73,11 +73,14 @@ export class Jogador {
  */
 export class Jogo {    
     public readonly grafo: number[][];
+    public readonly trincas: [number,number,number][];
     public grafoEstado: TipoOcupacao[][];
     public pecas: DadosPeca[];
     public jogadores: [Jogador, Jogador];
     public pecaSelecionada: number;
     
+    public func: {[key: string]: any};
+
     private _numRodadas: number;
     private _turno: Turno;
 
@@ -115,6 +118,30 @@ export class Jogo {
             [20, 22],       // 23
         ];
 
+        // Trincas
+        this.trincas = [
+            // Primeiro anel
+            [0, 1, 2],
+            [2, 4, 7],
+            [7, 6, 5],
+            [5, 3, 0],
+            // Segundo anel
+            [8, 9, 10],
+            [10, 12, 15],
+            [15, 14, 13],
+            [13, 11, 8],
+            // Terceiro anel
+            [16, 17, 18],
+            [18, 20, 23],
+            [23, 22, 21],
+            [21, 19, 16],
+            // Linhas
+            [1, 9, 17],
+            [4, 12, 20],
+            [6, 14, 22],
+            [3, 11, 19],
+        ];
+
         // Peças do tabuleiro
         this.pecas = new Array(posicoesTotal)
             .fill(0)
@@ -128,6 +155,8 @@ export class Jogo {
         // Inicializa o turno atual
         this._turno = Turno.Parado;
         this.pecaSelecionada = -1;
+
+        this.func = [];
     }
 
     get turno() {
@@ -173,10 +202,40 @@ export class Jogo {
     }
 
     /**
+     * Limpa o tabuleiro
+     */
+    cleanTabuleiro(): void {
+        // Preenche as ocupacoes do jogo
+        for (let i = 0; i < this.grafo.length; i++) {
+            for (const j of this.grafo[i]) {
+                this.grafoEstado[i][j] = TipoOcupacao.Vazio;
+            }
+        }
+    }
+
+    /**
+     * Troca o estado do jogo de ativo para inativo e vice-versa
+     * @returns retorna o novo estado do jogo
+     */
+    mudarEstado(): boolean {
+        if (this._turno != Turno.Parado) {
+            this._turno = Turno.Parado;
+            this.cleanTabuleiro();
+            
+            return false;
+        }
+
+        this.iniciarJogo();
+        return true;
+    }
+
+        /**
      * Executa um click em uma peça
      */
-    executarClick(num: number): [boolean, [string, string]] {
-        if (this._turno == Turno.Parado) false;
+    executarClick(num: number): Promise<RetornoAcao> {
+
+
+        /*
 
         if (this._turno == Turno.Jogador1) {
             if (
@@ -188,9 +247,13 @@ export class Jogo {
                     return [false, ['', '']];
                 } else if (this.pecaSelecionada >= 0 && num == this.pecaSelecionada) {
                     return [false, ['', '']]; 
-                } else if (this)
+                } else if (num != this.pecaSelecionada &&
+                    this.pecas[num].jogador == NumJogador.SemJogador
+                ) {
+                    this.pecaSelecionada = -1;
+                }
 
-                return [false, ['', '']];
+                //return [false, ['', '']];
             } else if (this.jogadores[0].rodadaJogador == RodadaJogo.FlutuarPecas) {
                 
                 
@@ -248,41 +311,105 @@ export class Jogo {
         }
 
         return [true, [msg1, msg2]];
-    }
+        */
+        const retornaFalha = () => {
+            return {
+                tipoAcao: TiposAcao.Falha,
+                pecaSelecionada: -1,
+                pecaRealcadas: [],
+                exibeAlertaGanhou: false,
+                exibeAlertaPerdeu: false,
+                permiteRemocao: false
+            } as RetornoAcao;
+        }
 
-    /**
-     * Limpa o tabuleiro
-     */
-    cleanTabuleiro(): void {
-        // Preenche as ocupacoes do jogo
-        for (let i = 0; i < this.grafo.length; i++) {
-            for (const j of this.grafo[i]) {
-                this.grafoEstado[i][j] = TipoOcupacao.Vazio;
+        if (this._turno == Turno.Parado) {
+            return new Promise(retornaFalha);
+        };
+
+        const idJogador = this._turno == Turno.Jogador1 ? 0 : 1;
+        const turnoJogador = this._turno == Turno.Jogador1 ? NumJogador.Jogador1 : NumJogador.Jogador2IA;
+
+        const verificaPecaVazia = () => new Promise((res, rej) => {
+            if (this.pecas[num].jogador != turnoJogador) {
+                res({});
+                return;
             }
+            else rej();
+        });
+
+        const verificaTrinca = () => new Promise(_ => {
+            for(const [pos1, pos2, pos3] of this.trincas) {
+                if (this.pecas[pos1].jogador == turnoJogador &&
+                    this.pecas[pos2].jogador == turnoJogador &&
+                    this.pecas[pos3].jogador == turnoJogador
+                ) {
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        const retornaColocarPecas = (trinca) => {
+            if (trinca) {
+                return {
+                    exibeAlertaGanhou: false,
+                    exibeAlertaPerdeu: false,
+                    pecaRealcadas: [], // realça as peças adversárias
+                    pecaSelecionada: -1, // Retira a seleção
+                    permiteRemocao: true
+                } as RetornoAcao;
+            }
+
+            return {
+                exibeAlertaGanhou: false,
+                exibeAlertaPerdeu: false,
+                pecaRealcadas: [], // realça as peças adversárias
+                pecaSelecionada: -1, // Retira a seleção
+                permiteRemocao: false
+            } as RetornoAcao;
         }
-    }
 
-    /**
-     * Troca o estado do jogo de ativo para inativo e vice-versa
-     * @returns retorna o novo estado do jogo
-     */
-    mudarEstado(): boolean {
-        if (this._turno != Turno.Parado) {
-            this._turno = Turno.Parado;
-            this.cleanTabuleiro();
-            
-            return false;
+        switch(this.jogadores[idJogador].rodadaJogador) {
+            case RodadaJogo.ColocarPecas:
+                return Promise.resolve()
+                    .then(verificaPecaVazia)
+                    .then(verificaTrinca)
+                    .then(retornaColocarPecas)
+                    .catch(retornaFalha);
+            case RodadaJogo.MoverPecas:
+                break;
+            case RodadaJogo.FlutuarPecas:
+                break;
         }
 
-        this.iniciarJogo();
-        return true;
-    }
-
-    /**
-     * Retorna quais posi
-     * @param pos Posicao
-     */
-    getProximaPosicoesMovimento(pos: number): ProximasPosicoes {
         return null;
     }
+
+    verificaPecaVazia() {
+
+    }
+}
+
+export enum TiposAcao {
+    ClickPosicaoLivreRodadaColocar, // Pinta o quadradao
+    ClickPosicaoLivreRodadaColocarTrinca, // Pinta o quadrado e permite remover uma peça
+    ClickPecaJogadorRodadaMover, // Seleciona a peça do jogador
+    ClickPosicaoLivrePecaSelecionadaRodadaMover, // Move a peça selecionada anteriormente para nova casa
+    ClickPosicaoLivrePecaSelecionadaRodadaMoverTrinca, // Move a peça selecionada anteriormente para nova casa e remove uma peça
+    ClickPosicaoLivreRodadaFlutuar, // Move a peça independente da posição
+    ClickPosicaoLivreRodadaFlutuarTrinca, // Move a peça independente da posição e remove peça adversária
+    CondicaoGanhou, // Remove todas as seleções e mostra alerta
+    CondicaoPerdeu, // Remove todas as seleções e mostra alerta
+    Falha // Não faz nada
+}
+
+export interface RetornoAcao {
+    tipoAcao: TiposAcao;
+    pecaSelecionada: number;
+    pecaRealcadas: number[],
+    exibeAlertaGanhou: boolean;
+    exibeAlertaPerdeu: boolean;
+    permiteRemocao: boolean;
 }
