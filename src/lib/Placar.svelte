@@ -5,11 +5,11 @@
     import Robo from '../assets/robo.png';
     import { Turno } from './tipos-basicos';
 
-    export let vitoriasJogador1 = 0;
-    export let vitoriasJogador2IA = 0;
-
     export let isJogoRunning = false;
     export let turno: Turno = Turno.Parado;
+
+    export let msgP1: string = '';
+    export let msgP2: string = '';
 
     const clickDispatch = createEventDispatcher();
 
@@ -25,7 +25,7 @@
         
         <div class="nome-jogador">
             <p><b>Humano P1</b></p>
-            <p>Vitórias: {vitoriasJogador1}</p>
+            <p>{msgP1}</p>
         </div>
 
         <div class:exibir={turno == Turno.Jogador1}> Sua vez!</div>
@@ -44,11 +44,11 @@
 
     <!-- CardIA -->
     <div>
-        <div class:exibir={turno == Turno.Jogador2IA}> Vez oponente!</div>
+        <div class:exibir={turno == Turno.Jogador2IA}> Vez dele!</div>
         
         <div class="nome-jogador">
-            <p><b>IA P2</b></p>
-            <p>Vitórias: {vitoriasJogador2IA}</p>
+            <p><b>Computador</b></p>
+            <p>{msgP2}</p>
         </div>
         
         <div><img src="{Robo}" alt="robo representando inteligência artificial"></div>

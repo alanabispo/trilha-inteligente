@@ -65,7 +65,7 @@ export class Jogador {
     }
 
     get id() {
-        return this.id;
+        return this._id;
     }
 }
 
@@ -79,7 +79,6 @@ export class Jogo {
     public pecas: DadosPeca[];
     public jogadores: [Jogador, Jogador];
     
-    private _vitorias: [number, number];
     private _numRodadas: number;
     private _turno: Turno;
 
@@ -129,9 +128,6 @@ export class Jogo {
 
         // Inicializa o turno atual
         this._turno = Turno.Parado;
-
-        // Inicializa demais variaveis
-        this._vitorias = [0, 0];
     }
 
     get turno() {
@@ -145,11 +141,7 @@ export class Jogo {
     get isJogoRunning() {
         return this._turno != Turno.Parado;
     }
-
-    get vitorias() {
-        return this._vitorias;
-    }
-
+    
     /**
      * Inicia um novo jogo
      */

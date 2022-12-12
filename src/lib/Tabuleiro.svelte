@@ -3,7 +3,7 @@
     import Peca from './Peca.svelte';
     import { Turno, type ActionFunction, type EvtClickPeca } from './tipos-basicos';
     import { DadosPeca, Jogo } from './jogo';
-    import { CorPecas } from './constantes';
+    import { CorPecas, Mensagens } from './constantes';
 
     // Debug
     const displayNumero = false;
@@ -20,6 +20,9 @@
 
     // Distancia para matriz interna
     const distanciaCentro = [0, 12.5, 25];
+
+    let msgP1: Mensagens = Mensagens.Aguardando;
+    let msgP2: Mensagens = Mensagens.Aguardando;
 
     // Cria o objeto principal do jogo
     let jogo = new Jogo(
@@ -153,8 +156,12 @@
 
         if (estado) {
             ativarRealceTodasPecas();
+            msgP1 = Mensagens.Coloca;
+            msgP2 = Mensagens.Coloca;
         } else {
             desativarRealceTodasPecas();
+            msgP1 = Mensagens.Aguardando;
+            msgP2 = Mensagens.Aguardando;
         }
 
         jogo = jogo;
@@ -188,8 +195,8 @@
     on:mudarEstado={onMudarEstado} 
     isJogoRunning={jogo.isJogoRunning}
     turno={novoTurno}
-    vitoriasJogador1={jogo.vitorias[0]}
-    vitoriasJogador2IA={jogo.vitorias[0]}
+    msgP1={msgP1}
+    msgP2={msgP2}
 ></Placar>
 <!-- ./Placar -->
 

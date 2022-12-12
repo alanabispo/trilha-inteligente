@@ -1,4 +1,4 @@
-import { NumJogador } from "./tipos-basicos"
+import { NumJogador } from './tipos-basicos'
 
 export const Cores = {
     Branco: '#fff',
@@ -12,5 +12,14 @@ export const CorPecas = {
     [NumJogador.Jogador2IA]: Cores.Vermelho
 }
 
-const empateTotalRodadas = 80; // A regra original é 200
-const empateRodadaFinal = 10;
+export const empateTotalRodadas = 80; // A regra original é 200
+export const empateRodadaFinal = 10;
+
+export enum Mensagens {
+    Aguardando = 'Aguardando',
+    Ganhou = 'Ganhou',
+    Perdeu = 'Perdeu',
+    Coloca = 'Colocar',
+    Move = 'Mover',
+    Voa = 'Voar'
+}
