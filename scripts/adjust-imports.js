@@ -60,3 +60,20 @@ for (const cssFilename of cssFilenames) {
     writeFileSync(cssFilePath, cssContent);
     console.log(`Arquivo ${cssFilename} reparado`);
 }
+
+// Define a pasta do arquivo
+const jsPath = resolve(rootDir, 'docs', 'assets');
+const jsFilenames = readdirSync(jsPath)
+    .filter(file => file.endsWith('.js'));
+
+// Para cada arquivo css
+for (const jsFilename of jsFilenames) {
+    // Pega e modifica o conteúdo
+    const jsFilePath = resolve(jsPath, jsFilename);
+    const jsContent = readFileSync(jsFilePath, 'utf-8')
+        .replace(/\/assets\//gm, 'assets/');
+
+    // Grava o arquivo
+    writeFileSync(jsFilePath, jsContent);
+    console.log(`Arquivo ${jsFilename} reparado`);
+}

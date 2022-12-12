@@ -368,8 +368,8 @@ class SvelteComponent {
     }
   }
 }
-const MulherNegra = "/assets/mulher-negra-b61d7544.png";
-const Robo = "/assets/robo-dfa03d3f.png";
+const MulherNegra = "assets/mulher-negra-b61d7544.png";
+const Robo = "assets/robo-dfa03d3f.png";
 var NumJogador = /* @__PURE__ */ ((NumJogador2) => {
   NumJogador2[NumJogador2["SemJogador"] = 0] = "SemJogador";
   NumJogador2[NumJogador2["Jogador1"] = 1] = "Jogador1";
