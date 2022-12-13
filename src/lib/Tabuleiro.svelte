@@ -7,7 +7,7 @@
     import { NumJogador, type EvtClickPeca, type PosicaoLinha, type PosicaoPeca } from './tipos-basicos';
 
     // Debug
-    const displayNumero = true;
+    const displayNumero = false;
 
     // Constantes
     const lado = 3;
