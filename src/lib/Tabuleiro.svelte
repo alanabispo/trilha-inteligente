@@ -203,28 +203,6 @@
                     msgP2 = res.msgP2;
                 }
             });
-        
-        /*
-        const evtDetails: EvtClickPeca = evt.detail;
-        
-        const [res, [msg1, msg2]] = jogo.executarClick(evtDetails.num);
-        if (!res) {
-            return;
-        }
-
-        corPecas[evtDetails.num] = CorPecas[turnoAtual];
-
-        novoTurno = jogo.turno;
-
-        if (jogo.turno == Turno.Jogador1 && jogo.jogadores[0].rodadaJogador != RodadaJogo.MoverPecas) {
-            ativarRealceTodasPecas();
-        } else {
-            desativarRealceTodasPecas();
-        }
-
-        msgP1 = msg1 as any;
-        msgP2 = msg2 as any;
-        */
     }
 
 </script>
