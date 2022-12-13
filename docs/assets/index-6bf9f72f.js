@@ -814,6 +814,7 @@ class Jogo {
     __publicField(this, "removerPeca");
     __publicField(this, "func");
     __publicField(this, "pecaSelecionadaAnteriormente");
+    __publicField(this, "modoRemocao");
     __publicField(this, "_numRodadas");
     __publicField(this, "_turno");
     __publicField(this, "_trincaAtiva");
@@ -870,6 +871,7 @@ class Jogo {
     this._trincaAtiva = [{}, {}];
     this.pecaSelecionadaAnteriormente = -1;
     this.removerPinturas = [];
+    this.modoRemocao = false;
   }
   get turno() {
     return this._turno;
@@ -906,11 +908,22 @@ class Jogo {
   mudarEstado() {
     if (this._turno != Turno.Parado) {
       this._turno = Turno.Parado;
+      this.modoRemocao = false;
       this.cleanTabuleiro();
       return false;
     }
+    this.modoRemocao = false;
     this.iniciarJogo();
     return true;
+  }
+  executarClickRemocao(num) {
+    const turnoJogador = this._turno == Turno.Jogador1 ? NumJogador.Jogador1 : NumJogador.Jogador2IA;
+    if (this.pecas[num].jogador == turnoJogador) {
+      this.pecas[num].jogador = NumJogador.SemJogador;
+      this.modoRemocao = false;
+      return true;
+    }
+    return false;
   }
   executarClick(num) {
     const retornaFalha = () => {
@@ -924,6 +937,9 @@ class Jogo {
         erro: true
       };
     };
+    if (this.modoRemocao) {
+      return new Promise(retornaFalha);
+    }
     if (this._turno == Turno.Parado) {
       return new Promise(retornaFalha);
     }
@@ -967,6 +983,7 @@ class Jogo {
     };
     const retornaColocarPecas = ([trinca, pecas]) => {
       if (trinca) {
+        this.modoRemocao = true;
         return {
           exibeAlertaGanhou: false,
           exibeAlertaPerdeu: false,
@@ -1038,6 +1055,7 @@ class Jogo {
     };
     const retornaMoverPecas = ([trinca, pecas]) => {
       if (trinca) {
+        this.modoRemocao = true;
         return {
           exibeAlertaGanhou: false,
           exibeAlertaPerdeu: false,
@@ -1097,22 +1115,22 @@ var TiposAcao = /* @__PURE__ */ ((TiposAcao2) => {
 const Tabuleiro_svelte_svelte_type_style_lang = "";
 function get_each_context(ctx, list, i) {
   const child_ctx = ctx.slice();
-  child_ctx[19] = list[i];
+  child_ctx[20] = list[i];
   return child_ctx;
 }
 function get_each_context_1(ctx, list, i) {
   const child_ctx = ctx.slice();
-  child_ctx[22] = list[i];
+  child_ctx[23] = list[i];
   return child_ctx;
 }
 function get_each_context_2(ctx, list, i) {
   const child_ctx = ctx.slice();
-  child_ctx[22] = list[i];
+  child_ctx[23] = list[i];
   return child_ctx;
 }
 function get_each_context_3(ctx, list, i) {
   const child_ctx = ctx.slice();
-  child_ctx[27] = list[i];
+  child_ctx[28] = list[i];
   return child_ctx;
 }
 function create_each_block_3(ctx) {
@@ -1120,13 +1138,13 @@ function create_each_block_3(ctx) {
   let current;
   peca = new Peca({
     props: {
-      posX: ctx[27].x,
-      posY: ctx[27].y,
-      num: ctx[27].n,
+      posX: ctx[28].x,
+      posY: ctx[28].y,
+      num: ctx[28].n,
       displayNumero,
-      realce: ctx[2][ctx[27].n],
-      corPeca: ctx[3][ctx[27].n],
-      seleciona: ctx[1][ctx[27].n]
+      realce: ctx[2][ctx[28].n],
+      corPeca: ctx[3][ctx[28].n],
+      seleciona: ctx[1][ctx[28].n]
     }
   });
   peca.$on("clickPeca", ctx[11]);
@@ -1141,11 +1159,11 @@ function create_each_block_3(ctx) {
     p(ctx2, dirty) {
       const peca_changes = {};
       if (dirty & 4)
-        peca_changes.realce = ctx2[2][ctx2[27].n];
+        peca_changes.realce = ctx2[2][ctx2[28].n];
       if (dirty & 8)
-        peca_changes.corPeca = ctx2[3][ctx2[27].n];
+        peca_changes.corPeca = ctx2[3][ctx2[28].n];
       if (dirty & 2)
-        peca_changes.seleciona = ctx2[1][ctx2[27].n];
+        peca_changes.seleciona = ctx2[1][ctx2[28].n];
       peca.$set(peca_changes);
     },
     i(local) {
@@ -1166,7 +1184,7 @@ function create_each_block_3(ctx) {
 function create_each_block_2(ctx) {
   let each_1_anchor;
   let current;
-  let each_value_3 = ctx[22];
+  let each_value_3 = ctx[23];
   let each_blocks = [];
   for (let i = 0; i < each_value_3.length; i += 1) {
     each_blocks[i] = create_each_block_3(get_each_context_3(ctx, each_value_3, i));
@@ -1190,7 +1208,7 @@ function create_each_block_2(ctx) {
     },
     p(ctx2, dirty) {
       if (dirty & 2574) {
-        each_value_3 = ctx2[22];
+        each_value_3 = ctx2[23];
         let i;
         for (i = 0; i < each_value_3.length; i += 1) {
           const child_ctx = get_each_context_3(ctx2, each_value_3, i);
@@ -1239,8 +1257,8 @@ function create_each_block_1(ctx) {
     c() {
       div = element("div");
       attr(div, "class", "linha svelte-co0e2r");
-      set_style(div, "--lado", ctx[22].lado + "px");
-      set_style(div, "--dist", ctx[22].dist + "%");
+      set_style(div, "--lado", ctx[23].lado + "px");
+      set_style(div, "--dist", ctx[23].dist + "%");
       set_style(div, "--borda", borda + "px");
     },
     m(target, anchor) {
@@ -1259,10 +1277,10 @@ function create_each_block(ctx) {
     c() {
       div = element("div");
       attr(div, "class", "conectores svelte-co0e2r");
-      set_style(div, "--l", ctx[19].l);
-      set_style(div, "--w", ctx[19].w);
-      set_style(div, "--t", ctx[19].t);
-      set_style(div, "--h", ctx[19].h);
+      set_style(div, "--l", ctx[20].l);
+      set_style(div, "--w", ctx[20].w);
+      set_style(div, "--t", ctx[20].t);
+      set_style(div, "--h", ctx[20].h);
       set_style(div, "--borda", borda + "px");
     },
     m(target, anchor) {
@@ -1555,9 +1573,18 @@ function instance($$self, $$props, $$invalidate) {
     $$invalidate(0, jogo);
     $$invalidate(4, novoTurno = jogo.turno);
   }
+  let modoRemocao = false;
   function handleClickPeca(evt) {
     const evtDetails = evt.detail;
     const turnoAtual = jogo.turno;
+    if (modoRemocao) {
+      if (jogo.executarClickRemocao(evtDetails.num)) {
+        modoRemocao = false;
+        $$invalidate(3, corPecas[evtDetails.num] = CorPecas[NumJogador.SemJogador], corPecas);
+        limpaRealces();
+      }
+      return;
+    }
     jogo.executarClick(evtDetails.num).then((res) => {
       console.log("Res", res);
       if (res.erro)
@@ -1581,6 +1608,7 @@ function instance($$self, $$props, $$invalidate) {
       if (!!res.msgP2) {
         $$invalidate(6, msgP2 = res.msgP2);
       }
+      modoRemocao = res.permiteRemocao;
     });
   }
   return [
