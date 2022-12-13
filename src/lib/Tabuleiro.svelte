@@ -143,9 +143,12 @@
         }
     }
 
+    let finalizaJogo = false;
+
     // Toda vez que se desejar reiniciar um jogo
     function onMudarEstado(): void {
         const estado = jogo.mudarEstado();
+        finalizaJogo = false;
 
         limpaRealces();
 
@@ -168,6 +171,7 @@
     }
 
     let modoRemocao = false;
+    let totalRodadas = 0;
 
     function handleClickPeca(evt: CustomEvent): void {
         const evtDetails: EvtClickPeca = evt.detail;
@@ -216,6 +220,27 @@
                 }
 
                 modoRemocao = res.permiteRemocao;
+            })
+            .then(() => {
+                const ganhador = jogo.alguemGanhou();
+                if (jogo.alguemGanhou() != NumJogador.SemJogador) {
+                    finalizaJogo = true;
+                    if (ganhador == NumJogador.Jogador1) {
+                        alert("Jogador Humano ganhou!");
+                        return;
+                    }
+
+                    alert("Jogador Computador ganhou!");
+                    return;
+                }
+
+                totalRodadas++;
+                if (totalRodadas == 100) {
+                    alert("Empate!");
+                    finalizaJogo = true;
+
+                    return;
+                }
             });
     }
 

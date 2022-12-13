@@ -1,4 +1,5 @@
 import { Mensagens } from "./constantes";
+import Tabuleiro from "./Tabuleiro.svelte";
 import { 
     NumJogador, 
     RodadaJogo, 
@@ -493,6 +494,29 @@ export class Jogo {
         }
 
         return null;
+    }
+
+    alguemGanhou(): NumJogador {
+        const turnoJogador = this._turno == Turno.Jogador1 ? NumJogador.Jogador1 : NumJogador.Jogador2IA;
+        
+        return NumJogador.SemJogador;
+    }
+
+    /**
+     * Implementação MiniMax
+     */
+    movimento(tabuleiro, jogador, pecas, pecasOponente) {}
+    
+    alphaBeta(tabuleiro, jogador, profundidade, pecas, pecasOponente) {}
+    
+    movimentos(tabuleiro, jogador, pecas) {}
+    
+    movimentosTrincaFechada(tabuleiro, jogador) {}
+
+    valorTabuleiro(tabuleiro, jogador) {}
+
+    miniMax() {
+        // Implementacao
     }
 }
 
