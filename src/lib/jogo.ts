@@ -83,6 +83,7 @@ export class Jogo {
     
     public func: {[key: string]: any};
     public pecaSelecionadaAnteriormente: number;
+    public modoRemocao: boolean;
 
     private _numRodadas: number;
     private _turno: Turno;
@@ -164,6 +165,7 @@ export class Jogo {
         this._trincaAtiva = [{}, {}];
         this.pecaSelecionadaAnteriormente = -1;
         this.removerPinturas = [];
+        this.modoRemocao = false;
     }
 
     get turno() {
@@ -227,16 +229,30 @@ export class Jogo {
     mudarEstado(): boolean {
         if (this._turno != Turno.Parado) {
             this._turno = Turno.Parado;
+            this.modoRemocao = false;
             this.cleanTabuleiro();
             
             return false;
         }
 
+        this.modoRemocao = false;
         this.iniciarJogo();
         return true;
     }
 
-        /**
+    executarClickRemocao(num: number): boolean {
+        const turnoJogador = this._turno == Turno.Jogador1 ? NumJogador.Jogador1 : NumJogador.Jogador2IA;
+        
+        if (this.pecas[num].jogador == turnoJogador) {
+            this.pecas[num].jogador = NumJogador.SemJogador;
+            this.modoRemocao = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Executa um click em uma peça
      */
     executarClick(num: number): Promise<RetornoAcao> {
@@ -250,6 +266,10 @@ export class Jogo {
                 permiteRemocao: false,
                 erro: true
             } as RetornoAcao;
+        }
+
+        if (this.modoRemocao) {
+            return new Promise(retornaFalha);
         }
 
         if (this._turno == Turno.Parado) {
@@ -319,6 +339,8 @@ export class Jogo {
 
         const retornaColocarPecas = ([trinca, pecas]: [boolean, number[]]): RetornoAcao => {
             if (trinca) {
+                this.modoRemocao = true;
+
                 return {
                     exibeAlertaGanhou: false,
                     exibeAlertaPerdeu: false,
@@ -404,6 +426,8 @@ export class Jogo {
 
         const retornaMoverPecas = ([trinca, pecas]: [boolean, number[]]): RetornoAcao => {
             if (trinca) {
+                this.modoRemocao = true;
+
                 return {
                     exibeAlertaGanhou: false,
                     exibeAlertaPerdeu: false,

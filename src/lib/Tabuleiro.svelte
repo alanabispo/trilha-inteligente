@@ -167,9 +167,21 @@
         novoTurno = jogo.turno;
     }
 
+    let modoRemocao = false;
+
     function handleClickPeca(evt: CustomEvent): void {
         const evtDetails: EvtClickPeca = evt.detail;
         const turnoAtual = jogo.turno;
+
+        if (modoRemocao) {
+            if (jogo.executarClickRemocao(evtDetails.num)) {
+                modoRemocao = false;
+                corPecas[evtDetails.num] = CorPecas[NumJogador.SemJogador];
+                limpaRealces();
+            }
+
+            return;
+        }
 
         jogo.executarClick(evtDetails.num)
             .then((res) => {
@@ -202,6 +214,8 @@
                 if (!!res.msgP2) {
                     msgP2 = res.msgP2;
                 }
+
+                modoRemocao = res.permiteRemocao;
             });
     }
 
