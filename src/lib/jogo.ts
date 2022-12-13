@@ -79,6 +79,7 @@ export class Jogo {
     public jogadores: [Jogador, Jogador];
     public pecaSelecionada: number;
     public removerPinturas: number[];
+    public removerPeca: number[];
     
     public func: {[key: string]: any};
     public pecaSelecionadaAnteriormente: number;
@@ -259,6 +260,24 @@ export class Jogo {
         const turnoJogador = this._turno == Turno.Jogador1 ? NumJogador.Jogador1 : NumJogador.Jogador2IA;
         const novoTurno = this._turno == Turno.Jogador1 ? Turno.Jogador2IA : Turno.Jogador1;
 
+        const realcaPecasVazias = () => {
+            if (idJogador == 0) return [];
+
+            return new Array(this.posicoesTotal)
+                .fill(false)
+                .map((_, i) => this.pecas[i].jogador == NumJogador.SemJogador ? i : -1)
+                .filter(el => el != -1);
+        }
+
+        const realcaPecasAdversario = () => {
+            return new Array(this.posicoesTotal)
+                .fill(false)
+                .map((_, i) => this.pecas[i].jogador != turnoJogador && this.pecas[i].jogador != NumJogador.SemJogador
+                    ? i 
+                    : -1)
+                .filter(el => el != -1);
+        }
+
         const verificaPecaVazia = () => {
             if (this.pecas[num].jogador == NumJogador.SemJogador) {
                 return;
@@ -303,7 +322,7 @@ export class Jogo {
                 return {
                     exibeAlertaGanhou: false,
                     exibeAlertaPerdeu: false,
-                    pecaRealcadas: [],
+                    pecaRealcadas: realcaPecasAdversario(),
                     pecaSelecionada: pecas,
                     removerPintura: [],
                     permiteRemocao: true,
@@ -316,7 +335,7 @@ export class Jogo {
             return {
                 exibeAlertaGanhou: false,
                 exibeAlertaPerdeu: false,
-                pecaRealcadas: [],
+                pecaRealcadas: realcaPecasVazias(),
                 pecaSelecionada: [],
                 removerPintura: [],
                 permiteRemocao: false,
@@ -388,7 +407,7 @@ export class Jogo {
                 return {
                     exibeAlertaGanhou: false,
                     exibeAlertaPerdeu: false,
-                    pecaRealcadas: [],
+                    pecaRealcadas: realcaPecasAdversario(),
                     pecaSelecionada: pecas,
                     permiteRemocao: true,
                     removerPintura: this.removerPinturas,
