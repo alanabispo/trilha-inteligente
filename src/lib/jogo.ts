@@ -78,8 +78,10 @@ export class Jogo {
     public pecas: DadosPeca[];
     public jogadores: [Jogador, Jogador];
     public pecaSelecionada: number;
+    public removerPinturas: number[];
     
     public func: {[key: string]: any};
+    public pecaSelecionadaAnteriormente: number;
 
     private _numRodadas: number;
     private _turno: Turno;
@@ -159,6 +161,8 @@ export class Jogo {
 
         this.func = [];
         this._trincaAtiva = [{}, {}];
+        this.pecaSelecionadaAnteriormente = -1;
+        this.removerPinturas = [];
     }
 
     get turno() {
@@ -235,8 +239,6 @@ export class Jogo {
      * Executa um click em uma peça
      */
     executarClick(num: number): Promise<RetornoAcao> {
-
-
         /*
 
         if (this._turno == Turno.Jogador1) {
@@ -380,8 +382,11 @@ export class Jogo {
                     exibeAlertaPerdeu: false,
                     pecaRealcadas: [],
                     pecaSelecionada: pecas,
+                    removerPintura: [],
                     permiteRemocao: true,
-                    erro: false
+                    erro: false,
+                    msgP1: Mensagens.Coloca,
+                    msgP2: Mensagens.Coloca
                 } as RetornoAcao;
             }
 
@@ -390,8 +395,11 @@ export class Jogo {
                 exibeAlertaPerdeu: false,
                 pecaRealcadas: [],
                 pecaSelecionada: [],
+                removerPintura: [],
                 permiteRemocao: false,
-                erro: false
+                erro: false,
+                msgP1: (this.jogadores[0].numRodadas < 9) ? Mensagens.Coloca : Mensagens.Move ,
+                msgP2: (this.jogadores[1].numRodadas < 9) ? Mensagens.Coloca : Mensagens.Move
             } as RetornoAcao;
         };
 
@@ -419,26 +427,72 @@ export class Jogo {
             return Promise.reject();
         };
 
-        const retornaMoverPecas = () => {
+        const retornaSelecionarMoverPecas = () => {
             const adjacentesLivres = [];
 
             for (const adjacente of this.grafo[num]) {
-                console.log('this.pecas[adjacente].jogador', this.pecas[adjacente].jogador)
                 if (this.pecas[adjacente].jogador == NumJogador.SemJogador) {
                     adjacentesLivres.push(adjacente);
                 }
             }
-            console.log(adjacentesLivres)
+
+            this.pecaSelecionadaAnteriormente = num;
 
             return {
                 exibeAlertaGanhou: false,
                 exibeAlertaPerdeu: false,
                 pecaRealcadas: adjacentesLivres,
                 pecaSelecionada: [num],
+                removerPintura: [],
                 permiteRemocao: false,
-                erro: false
+                erro: false,
+                msgP1: Mensagens.Move,
+                msgP2: Mensagens.Move
             } as RetornoAcao;
         };
+
+        const movePeca = () => {       
+            this.pecas[this.pecaSelecionadaAnteriormente].jogador = NumJogador.SemJogador;
+            this.pecas[num].jogador = turnoJogador;
+
+            this.removerPinturas = [this.pecaSelecionadaAnteriormente];
+
+            this.pecaSelecionadaAnteriormente = -1;
+        };
+
+        const retornaMoverPecas = ([trinca, pecas]: [boolean, number[]]): RetornoAcao => {
+            if (trinca) {
+                return {
+                    exibeAlertaGanhou: false,
+                    exibeAlertaPerdeu: false,
+                    pecaRealcadas: [],
+                    pecaSelecionada: pecas,
+                    permiteRemocao: true,
+                    removerPintura: this.removerPinturas,
+                    erro: false,
+                    msgP1: Mensagens.Move,
+                    msgP2: Mensagens.Move
+                } as RetornoAcao;
+            }
+
+            return {
+                exibeAlertaGanhou: false,
+                exibeAlertaPerdeu: false,
+                pecaRealcadas: [],
+                pecaSelecionada: [],
+                permiteRemocao: false,
+                removerPintura: this.removerPinturas,
+                erro: false,
+                msgP1: Mensagens.Move,
+                msgP2: Mensagens.Move
+            } as RetornoAcao;
+        };
+
+        const verificaAdjacente = () => {
+            if (this.grafo[this.pecaSelecionadaAnteriormente].indexOf(num) == -1) {
+                return Promise.reject();
+            }
+        }
 
         // O código começa aqui
         switch(this.jogadores[idJogador].rodadaJogador) {
@@ -451,11 +505,24 @@ export class Jogo {
                     .then(retornaColocarPecas)
                     .catch(retornaFalha);
             case RodadaJogo.MoverPecas:
-                    return Promise.resolve()
+                    if (this.pecaSelecionadaAnteriormente == -1 ||
+                        this.pecas[num].jogador == turnoJogador) {
+                        return Promise.resolve()
                         .then(verificaSePecaJogador)
+                        .then(retornaSelecionarMoverPecas)
+                        .catch(retornaFalha);
+                    }
+
+                    return Promise.resolve()
+                        .then(verificaPecaVazia)
+                        .then(verificaAdjacente)
+                        .then(movePeca)
+                        .then(incrementaRodada)
+                        .then(verificaTrinca)
                         .then(retornaMoverPecas)
                         .catch(retornaFalha);
             case RodadaJogo.FlutuarPecas:
+                // TODO
                 break;
         }
 
@@ -479,9 +546,12 @@ export enum TiposAcao {
 export interface RetornoAcao {
     tipoAcao: TiposAcao;
     pecaSelecionada: number[];
-    pecaRealcadas: number[],
+    pecaRealcadas: number[];
+    removerPintura: number[];
     exibeAlertaGanhou: boolean;
     exibeAlertaPerdeu: boolean;
     permiteRemocao: boolean;
     erro: boolean;
+    msgP1: Mensagens;
+    msgP2: Mensagens;
 }

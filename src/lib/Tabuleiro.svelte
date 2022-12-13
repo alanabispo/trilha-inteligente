@@ -4,7 +4,7 @@
     //import { RodadaJogo, Turno, type EvtClickPeca, type PosicaoLinha, type PosicaoPeca } from './tipos-basicos';
     import { Jogo } from './jogo';
     import { CorPecas, Mensagens } from './constantes';
-    import type { EvtClickPeca, PosicaoLinha, PosicaoPeca } from './tipos-basicos';
+    import { NumJogador, type EvtClickPeca, type PosicaoLinha, type PosicaoPeca } from './tipos-basicos';
 
     // Debug
     const displayNumero = true;
@@ -136,10 +136,10 @@
         }
     }
 
-    // Deixa as peças com a mesma cor inicial
-    function limpaEstadoTodasPecas(): void {
-        for (let i = 0; i < posicoesTotal; i++) {
-            corPecas[i] = CorPecas[0];
+    function limpaRealces() {
+        for (let i = 0 ; i < posicoesTotal; i++) {
+            pecasRealcadas[i] = false;
+            pecasSelecionada[i] = false;
         }
     }
 
@@ -147,7 +147,11 @@
     function onMudarEstado(): void {
         const estado = jogo.mudarEstado();
 
-        limpaEstadoTodasPecas();
+        limpaRealces();
+
+        for (let i = 0; i < posicoesTotal; i++) {
+            corPecas[i] = CorPecas[NumJogador.SemJogador];
+        }
 
         if (estado) {
             ativarRealceTodasPecas();
@@ -163,13 +167,6 @@
         novoTurno = jogo.turno;
     }
 
-    function limpaRealces() {
-        for (let i = 0 ; i < posicoesTotal; i++) {
-            pecasRealcadas[i] = false;
-            pecasSelecionada[i] = false;
-        }
-    }
-
     function handleClickPeca(evt: CustomEvent): void {
         const evtDetails: EvtClickPeca = evt.detail;
         const turnoAtual = jogo.turno;
@@ -181,6 +178,10 @@
                 if (res.erro) return;
 
                 corPecas[evtDetails.num] = CorPecas[turnoAtual];
+
+                for (const pintura of res.removerPintura) {
+                    corPecas[pintura] = CorPecas[NumJogador.SemJogador];
+                }
 
                 limpaRealces();
 
@@ -195,8 +196,12 @@
                 jogo = jogo;
                 novoTurno = jogo.turno;
                 
-                msgP1 = Mensagens[jogo.jogadores[0].rodadaJogador];
-                msgP2 = Mensagens[jogo.jogadores[1].rodadaJogador];
+                if (!!res.msgP1) {
+                    msgP1 = res.msgP1;
+                }
+                if (!!res.msgP2) {
+                    msgP2 = res.msgP2;
+                }
             });
         
         /*
