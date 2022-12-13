@@ -83,6 +83,7 @@ export class Jogo {
 
     private _numRodadas: number;
     private _turno: Turno;
+    private _trincaAtiva: [{[key: string]: boolean}, {[key: string]: boolean}];
 
     constructor(
         public posicoesTotal: number
@@ -157,6 +158,7 @@ export class Jogo {
         this.pecaSelecionada = -1;
 
         this.func = [];
+        this._trincaAtiva = [{}, {}];
     }
 
     get turno() {
@@ -315,11 +317,12 @@ export class Jogo {
         const retornaFalha = () => {
             return {
                 tipoAcao: TiposAcao.Falha,
-                pecaSelecionada: -1,
+                pecaSelecionada: [],
                 pecaRealcadas: [],
                 exibeAlertaGanhou: false,
                 exibeAlertaPerdeu: false,
-                permiteRemocao: false
+                permiteRemocao: false,
+                erro: true
             } as RetornoAcao;
         }
 
@@ -329,66 +332,134 @@ export class Jogo {
 
         const idJogador = this._turno == Turno.Jogador1 ? 0 : 1;
         const turnoJogador = this._turno == Turno.Jogador1 ? NumJogador.Jogador1 : NumJogador.Jogador2IA;
+        const novoTurno = this._turno == Turno.Jogador1 ? Turno.Jogador2IA : Turno.Jogador1;
 
-        const verificaPecaVazia = () => new Promise((res, rej) => {
-            if (this.pecas[num].jogador != turnoJogador) {
-                res({});
+        const verificaPecaVazia = () => {
+            if (this.pecas[num].jogador == NumJogador.SemJogador) {
                 return;
             }
-            else rej();
-        });
 
-        const verificaTrinca = () => new Promise(_ => {
+            return Promise.reject();
+        };
+
+        const objToKey = (obj) => JSON.stringify(obj);
+        const keyToObj = (obj) => JSON.parse(obj);
+
+        const verificaTrinca = (): [boolean, number[]] => {            
+            const trincas: { [key: string]: boolean } = {};
+            
             for(const [pos1, pos2, pos3] of this.trincas) {
                 if (this.pecas[pos1].jogador == turnoJogador &&
                     this.pecas[pos2].jogador == turnoJogador &&
                     this.pecas[pos3].jogador == turnoJogador
                 ) {
-                    return true;
+                    const trinca = [pos1, pos2, pos3];
+                    trincas[objToKey(trinca)] = true;
                 }
-
-                return false;
             }
-        });
 
-        const retornaColocarPecas = (trinca) => {
+            // Se trinca existia previamente ignora ela se é nova armazena
+            let trinca;
+            let achouTrinca = false;
+            for (const keyTrinca in trincas) {
+                if (!this._trincaAtiva[idJogador][keyTrinca]) {
+                    achouTrinca = true;
+                    trinca = keyToObj(keyTrinca);
+                }
+            }
+            
+            this._trincaAtiva[idJogador] = trincas;
+
+            return [achouTrinca, trinca];
+        };
+
+        const retornaColocarPecas = ([trinca, pecas]: [boolean, number[]]): RetornoAcao => {
             if (trinca) {
                 return {
                     exibeAlertaGanhou: false,
                     exibeAlertaPerdeu: false,
-                    pecaRealcadas: [], // realça as peças adversárias
-                    pecaSelecionada: -1, // Retira a seleção
-                    permiteRemocao: true
+                    pecaRealcadas: [],
+                    pecaSelecionada: pecas,
+                    permiteRemocao: true,
+                    erro: false
                 } as RetornoAcao;
             }
 
             return {
                 exibeAlertaGanhou: false,
                 exibeAlertaPerdeu: false,
-                pecaRealcadas: [], // realça as peças adversárias
-                pecaSelecionada: -1, // Retira a seleção
-                permiteRemocao: false
+                pecaRealcadas: [],
+                pecaSelecionada: [],
+                permiteRemocao: false,
+                erro: false
             } as RetornoAcao;
-        }
+        };
 
+        const incrementaRodada = () => {
+            this._numRodadas++;
+            this.jogadores[idJogador].numRodadas++;
+            this._turno = novoTurno;
+        };
+
+        const ocupaPeca = () => {
+            if (this.jogadores[idJogador].numRodadas < 8) {
+                this.pecas[num].jogador = turnoJogador;
+                return;
+            } 
+            
+            this.pecas[num].jogador = turnoJogador;
+            this.jogadores[idJogador].rodadaJogador = RodadaJogo.MoverPecas;
+        };
+
+        const verificaSePecaJogador = () => {
+            if (this.pecas[num].jogador == turnoJogador) {
+                return;
+            }
+
+            return Promise.reject();
+        };
+
+        const retornaMoverPecas = () => {
+            const adjacentesLivres = [];
+
+            for (const adjacente of this.grafo[num]) {
+                console.log('this.pecas[adjacente].jogador', this.pecas[adjacente].jogador)
+                if (this.pecas[adjacente].jogador == NumJogador.SemJogador) {
+                    adjacentesLivres.push(adjacente);
+                }
+            }
+            console.log(adjacentesLivres)
+
+            return {
+                exibeAlertaGanhou: false,
+                exibeAlertaPerdeu: false,
+                pecaRealcadas: adjacentesLivres,
+                pecaSelecionada: [num],
+                permiteRemocao: false,
+                erro: false
+            } as RetornoAcao;
+        };
+
+        // O código começa aqui
         switch(this.jogadores[idJogador].rodadaJogador) {
             case RodadaJogo.ColocarPecas:
                 return Promise.resolve()
                     .then(verificaPecaVazia)
+                    .then(ocupaPeca)
+                    .then(incrementaRodada)
                     .then(verificaTrinca)
                     .then(retornaColocarPecas)
                     .catch(retornaFalha);
             case RodadaJogo.MoverPecas:
-                break;
+                    return Promise.resolve()
+                        .then(verificaSePecaJogador)
+                        .then(retornaMoverPecas)
+                        .catch(retornaFalha);
             case RodadaJogo.FlutuarPecas:
                 break;
         }
 
         return null;
-    }
-
-    verificaPecaVazia() {
-
     }
 }
 
@@ -407,9 +478,10 @@ export enum TiposAcao {
 
 export interface RetornoAcao {
     tipoAcao: TiposAcao;
-    pecaSelecionada: number;
+    pecaSelecionada: number[];
     pecaRealcadas: number[],
     exibeAlertaGanhou: boolean;
     exibeAlertaPerdeu: boolean;
     permiteRemocao: boolean;
+    erro: boolean;
 }

@@ -4,7 +4,7 @@
     //import { RodadaJogo, Turno, type EvtClickPeca, type PosicaoLinha, type PosicaoPeca } from './tipos-basicos';
     import { Jogo } from './jogo';
     import { CorPecas, Mensagens } from './constantes';
-    import type { PosicaoLinha, PosicaoPeca } from './tipos-basicos';
+    import type { EvtClickPeca, PosicaoLinha, PosicaoPeca } from './tipos-basicos';
 
     // Debug
     const displayNumero = true;
@@ -163,12 +163,45 @@
         novoTurno = jogo.turno;
     }
 
+    function limpaRealces() {
+        for (let i = 0 ; i < posicoesTotal; i++) {
+            pecasRealcadas[i] = false;
+            pecasSelecionada[i] = false;
+        }
+    }
+
     function handleClickPeca(evt: CustomEvent): void {
+        const evtDetails: EvtClickPeca = evt.detail;
+        const turnoAtual = jogo.turno;
+
+        jogo.executarClick(evtDetails.num)
+            .then((res) => {
+                console.log('Res', res);
+
+                if (res.erro) return;
+
+                corPecas[evtDetails.num] = CorPecas[turnoAtual];
+
+                limpaRealces();
+
+                for (const peca of res.pecaRealcadas) {
+                    pecasRealcadas[peca] = true;
+                }
+
+                for (const peca of res.pecaSelecionada) {
+                    pecasSelecionada[peca] = true;
+                }
+
+                jogo = jogo;
+                novoTurno = jogo.turno;
+                
+                msgP1 = Mensagens[jogo.jogadores[0].rodadaJogador];
+                msgP2 = Mensagens[jogo.jogadores[1].rodadaJogador];
+            });
+        
         /*
         const evtDetails: EvtClickPeca = evt.detail;
         
-        const turnoAtual = jogo.turno;
-
         const [res, [msg1, msg2]] = jogo.executarClick(evtDetails.num);
         if (!res) {
             return;
